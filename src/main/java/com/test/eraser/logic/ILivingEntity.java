@@ -16,6 +16,8 @@ public interface ILivingEntity {
 
     void toolinstantKill();
 
+    void toolinstantKill(Player player);
+
     void forceErase();
 
     boolean wasFullset();//SnackProtector

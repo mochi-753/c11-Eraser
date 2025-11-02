@@ -26,7 +26,7 @@ public class Eraser_Item extends SwordItem {
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity target) {
         if (target instanceof ILivingEntity erased) {
-            erased.toolinstantKill();
+            erased.toolinstantKill(player);
         }
         target.kill();
         return false;

@@ -90,7 +90,7 @@ public class World_Destroyer_Item extends PickaxeItem {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity target) {
-        if (target instanceof ILivingEntity target_)target_.toolinstantKill();
+        if (target instanceof ILivingEntity target_)target_.toolinstantKill(player);
         return false;
     }
 

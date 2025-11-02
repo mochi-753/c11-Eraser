@@ -16,7 +16,6 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ExperienceOrb;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntitySection;
 import net.minecraft.world.level.entity.EntitySectionStorage;
 import net.minecraft.world.level.entity.EntityTickList;
@@ -165,7 +164,10 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     public void toolinstantKill() {
         instantKill((Player) null,7);
     }
-
+    @Override
+    public void toolinstantKill(Player player) {
+        instantKill(player,7);
+    }
     @Override
     public void forceErase() {
         LivingEntity self = (LivingEntity) (Object) this;
