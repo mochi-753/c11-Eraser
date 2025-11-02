@@ -1,13 +1,13 @@
 package com.test.eraser.additional;
 
+import com.mojang.brigadier.Command;
 import com.test.eraser.Eraser;
 import com.test.eraser.logic.ILivingEntity;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import com.mojang.brigadier.Command;
-import net.minecraft.commands.Commands;
-import net.minecraft.commands.CommandSourceStack;
 
 @Mod.EventBusSubscriber(modid = Eraser.MODID)
 public class ModCommands {

@@ -2,11 +2,10 @@ package com.test.eraser.additional;
 
 import com.test.eraser.logic.ILivingEntity;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.ArmorItem.Type;
+import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraftforge.event.entity.living.LivingChangeTargetEvent;
 import net.minecraftforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -115,8 +114,8 @@ public class SnackArmor {
 
             if (isFullSet(player)) {
                 applyAbilities(player);
-            } else if(player instanceof ILivingEntity Iliving) {
-                if(Iliving.wasFullset())resetAbilities(player);
+            } else if (player instanceof ILivingEntity Iliving) {
+                if (Iliving.wasFullset()) resetAbilities(player);
             }
         }
 
@@ -162,22 +161,22 @@ public class SnackArmor {
         }*/
 
         private static void applyAbilities(Player player) {
-            if(player.getAbilities().mayfly && player.getAbilities().invulnerable) return;
+            if (player.getAbilities().mayfly && player.getAbilities().invulnerable) return;
             player.getAbilities().mayfly = true;
-            if(!player.onGround())player.getAbilities().flying = true;
+            if (!player.onGround()) player.getAbilities().flying = true;
             player.getAbilities().invulnerable = true;
             player.onUpdateAbilities();
             player.getFoodData().setFoodLevel(20);
             player.getFoodData().setSaturation(20.0F);
             player.setHealth(player.getMaxHealth());
-            if(player instanceof ILivingEntity Iliving) Iliving.setwassFullset(true);
+            if (player instanceof ILivingEntity Iliving) Iliving.setwassFullset(true);
         }
 
         private static void resetAbilities(Player player) {
             player.getAbilities().mayfly = false;
             player.getAbilities().invulnerable = false;
             player.onUpdateAbilities();
-            if(player instanceof ILivingEntity Iliving) Iliving.setwassFullset(false);
+            if (player instanceof ILivingEntity Iliving) Iliving.setwassFullset(false);
         }
 
         @SubscribeEvent

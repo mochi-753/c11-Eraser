@@ -1,14 +1,11 @@
 package com.test.eraser.client;
 
+import com.test.eraser.Eraser;
 import com.test.eraser.additional.ModEntities;
 import com.test.eraser.additional.ModKeyBindings;
-import com.test.eraser.client.renderer.CustomArmorOverlayLayer;
 import com.test.eraser.client.renderer.SandBagRenderer;
 import com.test.eraser.entity.HomingArrowEntity;
-import com.test.eraser.Eraser;
 import net.minecraft.client.renderer.entity.ArrowRenderer;
-import net.minecraft.client.renderer.entity.LivingEntityRenderer;
-import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;

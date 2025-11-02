@@ -10,16 +10,22 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(LivingEntity.class)
 public interface LivingEntityAccessor {
+    @Accessor("DATA_HEALTH_ID")
+    static EntityDataAccessor<Float> getDataHealthId() {
+        throw new AssertionError();
+    }
+
     @Accessor("lastHurtByPlayer")
     Player getLastHurtByPlayer();
 
     @Accessor("lastHurtByPlayer")
     void setLastHurtByPlayer(Player player);
 
-    @Accessor("DATA_HEALTH_ID")
-    static EntityDataAccessor<Float> getDataHealthId() {
-        throw new AssertionError();
-    }
+    @Accessor("lastHurtByPlayerTime")
+    int getLastHurtByPlayerTime();
+
+    @Accessor("lastHurtByPlayerTime")
+    void setLastHurtByPlayerTime(int time);
 
     @Invoker("dropExperience")
     void invokeDropExperience();

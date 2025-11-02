@@ -1,7 +1,6 @@
 package com.test.eraser.additional;
 
 import com.test.eraser.spells.GazeDeathSpell;
-import io.redspace.ironsspellbooks.IronsSpellbooks;
 import io.redspace.ironsspellbooks.api.registry.SpellRegistry;
 import io.redspace.ironsspellbooks.api.spells.AbstractSpell;
 import net.minecraftforge.eventbus.api.IEventBus;

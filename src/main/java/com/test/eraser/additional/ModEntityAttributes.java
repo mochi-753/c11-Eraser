@@ -1,7 +1,7 @@
 package com.test.eraser.additional;
 
-import com.test.eraser.entity.Sand_Bag;
 import com.test.eraser.Eraser;
+import com.test.eraser.entity.Sand_Bag;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;

@@ -2,21 +2,17 @@ package com.test.eraser.logic;
 
 import com.test.eraser.Eraser;
 import com.test.eraser.additional.ModDamageTypes;
-//import com.test.eraser.Mixin.Armor_And_Eraser.LivingEntityAccessor;
-//import com.test.eraser.Mixin.LevelEntityGetterAdapterAccessor;
 import com.test.eraser.additional.SnackArmor;
 import com.test.eraser.entity.HomingArrowEntity;
-import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.LivingHurtEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.event.entity.living.*;
-import net.minecraftforge.eventbus.api.EventPriority;
-import net.minecraft.world.entity.Entity;
-
-import net.minecraftforge.event.entity.living.LivingDeathEvent;
 
 @Mod.EventBusSubscriber(modid = Eraser.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class AttackHandler {

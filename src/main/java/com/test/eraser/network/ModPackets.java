@@ -1,10 +1,10 @@
 package com.test.eraser.network;
 
+import com.test.eraser.network.packets.EraserRangeAttackPacket;
 import com.test.eraser.network.packets.RayCastPacket;
 import com.test.eraser.network.packets.ShieldEffectPacket;
 import com.test.eraser.network.packets.WorldDestroyerChangeModePacket;
 import net.minecraftforge.network.NetworkDirection;
-import com.test.eraser.network.packets.EraserRangeAttackPacket;
 
 import java.util.Optional;
 

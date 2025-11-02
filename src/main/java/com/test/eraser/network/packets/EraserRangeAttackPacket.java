@@ -2,16 +2,17 @@ package com.test.eraser.network.packets;
 
 import com.test.eraser.logic.ILivingEntity;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.network.NetworkEvent;
-import net.minecraft.server.level.ServerPlayer;
 
 import java.util.List;
 import java.util.function.Supplier;
 
 public class EraserRangeAttackPacket {
-    public EraserRangeAttackPacket() {}
+    public EraserRangeAttackPacket() {
+    }
 
     public static void encode(EraserRangeAttackPacket msg, FriendlyByteBuf buf) {
     }
@@ -34,7 +35,7 @@ public class EraserRangeAttackPacket {
                 );
 
                 for (LivingEntity target : targets) {
-                    if (target instanceof ILivingEntity target_)target_.toolinstantKill();
+                    if (target instanceof ILivingEntity target_) target_.toolinstantKill();
                 }
             }
         });

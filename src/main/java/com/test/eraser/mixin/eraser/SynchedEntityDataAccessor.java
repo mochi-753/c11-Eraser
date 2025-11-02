@@ -11,6 +11,7 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 public interface SynchedEntityDataAccessor {
     @Invoker("getItem")
     <T> SynchedEntityData.DataItem<T> invokeGetItem(EntityDataAccessor<T> accessor);
+
     @Accessor("entity")
     Entity getEntity();
 

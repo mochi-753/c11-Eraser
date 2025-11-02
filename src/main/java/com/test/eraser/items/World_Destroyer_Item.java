@@ -1,21 +1,36 @@
 package com.test.eraser.items;
 
 import com.test.eraser.additional.ModTiers;
-import com.test.eraser.logic.ILivingEntity;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.*;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.PickaxeItem;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraft.network.chat.Component;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
+import static com.test.eraser.utils.Eraser_Utils.killIfParentFound;
+
 public class World_Destroyer_Item extends PickaxeItem {
     public World_Destroyer_Item(Properties props) {
         super(ModTiers.WORLD_DESTROYER_TIER, 1, -2.8F, props.stacksTo(1).fireResistant());
+    }
+
+    private static int waveGrayWhiteColor(long time, int index, double speed) {
+        double wave = (Math.sin((time / speed) + index) + 1.0) / 2.0;
+        int gray = 0xAAAAAA;
+        int white = 0xFFFFFF;
+        int r = (int) (((gray >> 16) & 0xFF) * (1 - wave) + ((white >> 16) & 0xFF) * wave);
+        int g = (int) (((gray >> 8) & 0xFF) * (1 - wave) + ((white >> 8) & 0xFF) * wave);
+        int b = (int) ((gray & 0xFF) * (1 - wave) + (white & 0xFF) * wave);
+
+        return (0xFF << 24) | (r << 16) | (g << 8) | b;
     }
 
     @Override
@@ -90,7 +105,7 @@ public class World_Destroyer_Item extends PickaxeItem {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity target) {
-        if (target instanceof ILivingEntity target_)target_.toolinstantKill();
+        killIfParentFound(target, player, 7, 32);
         return false;
     }
 
@@ -101,7 +116,7 @@ public class World_Destroyer_Item extends PickaxeItem {
 
         if (!level.isClientSide) {
             ItemStack cookie = new ItemStack(Items.COOKIE, 1);
-            if(player.isShiftKeyDown()) {
+            if (player.isShiftKeyDown()) {
                 cookie = new ItemStack(Items.COOKIE, 64);
             }
             if (!player.addItem(cookie)) {
@@ -116,16 +131,5 @@ public class World_Destroyer_Item extends PickaxeItem {
     @Override
     public boolean isDamageable(ItemStack stack) {
         return false;
-    }
-
-    private static int waveGrayWhiteColor(long time, int index, double speed) {
-        double wave = (Math.sin((time / speed) + index) + 1.0) / 2.0;
-        int gray = 0xAAAAAA;
-        int white = 0xFFFFFF;
-        int r = (int) (((gray >> 16) & 0xFF) * (1 - wave) + ((white >> 16) & 0xFF) * wave);
-        int g = (int) (((gray >> 8) & 0xFF) * (1 - wave) + ((white >> 8) & 0xFF) * wave);
-        int b = (int) ((gray & 0xFF) * (1 - wave) + (white & 0xFF) * wave);
-
-        return (0xFF << 24) | (r << 16) | (g << 8) | b;
     }
 }

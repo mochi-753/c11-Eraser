@@ -7,6 +7,8 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 @Mixin(net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen.class)
 public interface CreativeModeInventoryScreenAccess {
     @Accessor(value = "selectedTab", remap = true)
-    static CreativeModeTab getSelectedTab() { throw new AssertionError(); }
+    static CreativeModeTab getSelectedTab() {
+        throw new AssertionError();
+    }
 
 }

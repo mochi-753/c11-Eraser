@@ -29,7 +29,7 @@ public class RayCastPacket {
             if (sender != null) {
                 Entity target = sender.level().getEntity(msg.entityId);
                 if (target != null) {
-                    if (target instanceof ILivingEntity target_)target_.instantKill();
+                    if (target instanceof ILivingEntity target_) target_.instantKill();
                 }
             }
         });

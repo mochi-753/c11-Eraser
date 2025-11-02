@@ -1,16 +1,28 @@
 package com.test.eraser.items;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.Level;
+
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class Null_Ingot_Item extends Item {
     public Null_Ingot_Item(Properties props) {
         super(props);
+    }
+
+    private static int waveGrayWhiteColor(long time, int index, double speed) {
+        double wave = (Math.sin((time / speed) + index) + 1.0) / 2.0;
+        int gray = 0xAAAAAA;
+        int white = 0xFFFFFF;
+        int r = (int) (((gray >> 16) & 0xFF) * (1 - wave) + ((white >> 16) & 0xFF) * wave);
+        int g = (int) (((gray >> 8) & 0xFF) * (1 - wave) + ((white >> 8) & 0xFF) * wave);
+        int b = (int) ((gray & 0xFF) * (1 - wave) + (white & 0xFF) * wave);
+
+        return (0xFF << 24) | (r << 16) | (g << 8) | b;
     }
 
     @Override
@@ -26,7 +38,6 @@ public class Null_Ingot_Item extends Item {
         }
         return result;
     }
-
 
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
@@ -47,16 +58,5 @@ public class Null_Ingot_Item extends Item {
         }
 
         tooltip.add(1, waveLine);
-    }
-
-    private static int waveGrayWhiteColor(long time, int index, double speed) {
-        double wave = (Math.sin((time / speed) + index) + 1.0) / 2.0;
-        int gray = 0xAAAAAA;
-        int white = 0xFFFFFF;
-        int r = (int)(((gray >> 16) & 0xFF) * (1 - wave) + ((white >> 16) & 0xFF) * wave);
-        int g = (int)(((gray >> 8) & 0xFF) * (1 - wave) + ((white >> 8) & 0xFF) * wave);
-        int b = (int)((gray & 0xFF) * (1 - wave) + (white & 0xFF) * wave);
-
-        return (0xFF << 24) | (r << 16) | (g << 8) | b;
     }
 }

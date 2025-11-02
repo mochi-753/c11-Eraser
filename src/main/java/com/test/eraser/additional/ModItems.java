@@ -6,6 +6,7 @@ import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
+
 import java.util.List;
 import java.util.stream.Collectors;
 

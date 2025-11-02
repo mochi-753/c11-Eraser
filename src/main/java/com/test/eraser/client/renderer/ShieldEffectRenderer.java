@@ -46,6 +46,7 @@ public class ShieldEffectRenderer {
     private static class ShieldInstance {
         Vec3 pos;
         int ticks;
+
         ShieldInstance(Vec3 pos, int ticks) {
             this.pos = pos;
             this.ticks = ticks;

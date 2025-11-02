@@ -9,18 +9,16 @@ public enum DestroyMode {
     CUBE(3, 3, 3, 0),
     TUNNEL(3, 3, 7, 0);
 
+    private static final String KEY = "WorldDestroyerMode";
+    private static final String SILK_KEY = "SilkTouchEnabled"; // ← 追加
     public final int x, y, z;
     public final int yOffset;
-
     DestroyMode(int x, int y, int z, int yOffset) {
         this.x = x;
         this.y = y;
         this.z = z;
         this.yOffset = yOffset;
     }
-
-    private static final String KEY = "WorldDestroyerMode";
-    private static final String SILK_KEY = "SilkTouchEnabled"; // ← 追加
 
     public static DestroyMode cycleMode(ItemStack stack) {
         DestroyMode current = getMode(stack);

@@ -1,7 +1,7 @@
 package com.test.eraser.utils;
 
-import com.test.eraser.additional.ModItems;
 import com.test.eraser.Eraser;
+import com.test.eraser.additional.ModItems;
 import com.test.eraser.logic.DestroyBlock;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;

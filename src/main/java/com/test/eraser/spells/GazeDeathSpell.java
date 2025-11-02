@@ -1,24 +1,32 @@
 package com.test.eraser.spells;
 
 import com.test.eraser.logic.ILivingEntity;
-import io.redspace.ironsspellbooks.api.spells.*;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
-import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
-import io.redspace.ironsspellbooks.spells.EntityCastData;
-import io.redspace.ironsspellbooks.spells.eldritch.AbstractEldritchSpell;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
+import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
+import io.redspace.ironsspellbooks.api.spells.*;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.*;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.List;
 import java.util.Optional;
+
 @AutoSpellConfig
 public class GazeDeathSpell extends AbstractSpell {
+
+    private final DefaultConfig defaultConfig = new DefaultConfig()
+            .setMinRarity(SpellRarity.LEGENDARY)
+            .setSchoolResource(SchoolRegistry.HOLY_RESOURCE)
+            .setMaxLevel(3)
+            .setCooldownSeconds(0)
+            .build();
 
     public GazeDeathSpell() {
         super();
@@ -28,13 +36,6 @@ public class GazeDeathSpell extends AbstractSpell {
         this.castTime = 0;
         this.baseManaCost = 10;
     }
-
-    private final DefaultConfig defaultConfig = new DefaultConfig()
-            .setMinRarity(SpellRarity.LEGENDARY)
-            .setSchoolResource(SchoolRegistry.HOLY_RESOURCE)
-            .setMaxLevel(3)
-            .setCooldownSeconds(0)
-            .build();
 
     @Override
     public void onCast(Level level, int spellLevel, LivingEntity caster, CastSource source, MagicData data) {
@@ -56,7 +57,7 @@ public class GazeDeathSpell extends AbstractSpell {
             case 3 -> {
                 if (target instanceof ILivingEntity erased) {
                     if (caster instanceof net.minecraft.world.entity.player.Player p) {
-                        erased.instantKill(p,1);
+                        erased.instantKill(p, 1);
                     } else {
                         erased.instantKill();
                     }

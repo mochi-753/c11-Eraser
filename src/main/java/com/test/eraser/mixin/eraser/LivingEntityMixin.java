@@ -12,11 +12,11 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ClassInstanceMultiMap;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.ExperienceOrb;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.entity.EntitySection;
 import net.minecraft.world.level.entity.EntitySectionStorage;
 import net.minecraft.world.level.entity.EntityTickList;
@@ -26,13 +26,12 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.damagesource.DamageSource;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import javax.annotation.Nullable;
 import java.lang.reflect.Method;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
@@ -41,6 +40,8 @@ public abstract class LivingEntityMixin implements ILivingEntity {
 
     @Unique
     private boolean erased = false;
+    @Unique
+    private boolean Fullset = false;
 
     @Override
     public boolean isErased() {
@@ -52,11 +53,10 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         this.erased = flag;
     }
 
-    @Unique
-    private boolean Fullset = false;
-
     @Override
-    public boolean wasFullset(){ return this.Fullset;}
+    public boolean wasFullset() {
+        return this.Fullset;
+    }
 
     @Override
     public void setwassFullset(boolean Fullset) {
@@ -80,7 +80,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
 
     @Override
     public void instantKill(Player attacker, @Nullable int moredrop) {
-        LivingEntity self = (LivingEntity)(Object)this;
+        LivingEntity self = (LivingEntity) (Object) this;
         if (!self.isAlive()) return;
 
         List<Entity> nearby = self.level().getEntities(self, self.getBoundingBox().inflate(32));
@@ -92,8 +92,8 @@ public abstract class LivingEntityMixin implements ILivingEntity {
                     for (Object part : arr) {
                         if (part == self) {
                             if (e instanceof LivingEntity parent && parent instanceof ILivingEntity erasedParent) {
-                                erasedParent.instantKill(attacker,moredrop);
-                                return;
+                                erasedParent.instantKill(attacker, moredrop);
+                                //return;
                             }
                         }
                     }
@@ -112,13 +112,14 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             EntityDataAccessor<Float> healthId = LivingEntityAccessor.getDataHealthId();
             SynchedEntityDataUtil.forceSet(self.getEntityData(), healthId, 0.0F);
             ((LivingEntityAccessor) self).setLastHurtByPlayer(attacker);
+            ((LivingEntityAccessor) self).setLastHurtByPlayerTime((int) Instant.now().getEpochSecond());
             self.getCombatTracker().recordDamage(eraseSrc, Float.MAX_VALUE);
         } catch (Throwable t) {
             t.printStackTrace();
         }
 
         try {
-            forcedie(eraseSrc , moredrop);
+            forcedie(eraseSrc, moredrop);
             forceErase();
         } catch (Throwable t) {
             t.printStackTrace();
@@ -130,40 +131,33 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         //but can kill without calling on ChengeDimention lawl
     }
 
-    private void forcedie(DamageSource source , int moredrop) {
+    private void forcedie(DamageSource source, int moredrop) {
         LivingEntity self = (LivingEntity) (Object) this;
         ((LivingEntityAccessor) self).setDeadFlag(true);
         if (!self.level().isClientSide) {
             if (self instanceof ServerPlayer sp) {
                 Component deathMsg = sp.getCombatTracker().getDeathMessage();
                 sp.connection.send(new ClientboundPlayerCombatKillPacket(sp.getId(), deathMsg));
-                if(((LivingEntityAccessor) self).isDeadFlag())sp.server.getPlayerList().broadcastSystemMessage(deathMsg, false);
+                if (((LivingEntityAccessor) self).isDeadFlag())
+                    sp.server.getPlayerList().broadcastSystemMessage(deathMsg, false);
             }
-
-            int remaining = self.getExperienceReward();
-            while (remaining > 0) {
-                int orbValue = ExperienceOrb.getExperienceValue(remaining);
-                remaining -= orbValue;
-                ExperienceOrb orb = new ExperienceOrb(self.level(), self.getX(), self.getY(), self.getZ(), orbValue);
-                self.level().addFreshEntity(orb);
-            }
-            int moreDrop = moredrop;
-            while (moreDrop > 0) {
-                moreDrop -= 1;
-                ((LivingEntityAccessor) self).invokeDropAllDeathLoot(source);
-            }
-            self.level().broadcastEntityEvent(self, (byte)3);
+            ((LivingEntityAccessor) self).invokeDropAllDeathLoot(source);
         }
     }
 
     @Override
     public void instantKill() {
-        instantKill((Player) null,1);
+        instantKill((Player) null, 1);
     }
 
     @Override
     public void toolinstantKill() {
-        instantKill((Player) null,7);
+        instantKill((Player) null, 7);
+    }
+
+    @Override
+    public void toolinstantKill(Player player) {
+        instantKill(player, 7);
     }
 
     @Override
@@ -269,12 +263,13 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         }
     }
 
-    @Inject(method = "tick", at = @At("HEAD"))
+    @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void eraser$shrinkAABBOnTick(CallbackInfo ci) {
         LivingEntity self = (LivingEntity) (Object) this;
         if (isErased()) {
             self.setBoundingBox(new AABB(self.getX(), self.getY(), self.getZ(),
                     self.getX(), self.getY(), self.getZ()));
+            ci.cancel();
         }
     }
 }

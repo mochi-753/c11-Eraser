@@ -14,9 +14,8 @@ public abstract class GameRendererMixin {
 
     @Inject(method = "getNightVisionScale", at = @At("HEAD"), cancellable = true)
     private static void eraser$forceNightVision(LivingEntity entity, float partialTicks, CallbackInfoReturnable<Float> cir) {
-        if(entity instanceof Player player) if(SnackArmor.SnackProtector.isFullSet(player)) {
+        if (entity instanceof Player player) if (SnackArmor.SnackProtector.isFullSet(player)) {
             cir.setReturnValue(1.0F);
-            System.out.println("ahhhhhhhhhhhhhhhhhhhhh");
             cir.cancel();
             return;
         }

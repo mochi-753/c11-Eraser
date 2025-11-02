@@ -6,12 +6,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
+
 import java.util.function.Supplier;
 
 
 public class WorldDestroyerChangeModePacket {
-    private final DestroyMode mode;
     public final boolean silkEnabled;
+    private final DestroyMode mode;
 
     public WorldDestroyerChangeModePacket(DestroyMode mode, boolean silkEnabled) {
         this.mode = mode;

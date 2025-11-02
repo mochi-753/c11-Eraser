@@ -20,11 +20,17 @@ import java.util.List;
 
 public class DestroyBlock {
 
-    public static void breakBlockNormal(ServerLevel level, ServerPlayer player, BlockPos pos, ItemStack tool) {doBreakBlock(level, player, pos, tool, 0, false);}
+    public static void breakBlockNormal(ServerLevel level, ServerPlayer player, BlockPos pos, ItemStack tool) {
+        doBreakBlock(level, player, pos, tool, 0, false);
+    }
 
-    public static void breakBlockWithFortune(ServerLevel level, ServerPlayer player, BlockPos pos, ItemStack tool, int fortuneLevel) {doBreakBlock(level, player, pos, tool, fortuneLevel, false);}
+    public static void breakBlockWithFortune(ServerLevel level, ServerPlayer player, BlockPos pos, ItemStack tool, int fortuneLevel) {
+        doBreakBlock(level, player, pos, tool, fortuneLevel, false);
+    }
 
-    public static void breakBlockSilk(ServerLevel level, ServerPlayer player, BlockPos pos, ItemStack tool) {doBreakBlock(level, player, pos, tool, 0, true);}
+    public static void breakBlockSilk(ServerLevel level, ServerPlayer player, BlockPos pos, ItemStack tool) {
+        doBreakBlock(level, player, pos, tool, 0, true);
+    }
 
     private static void doBreakBlock(ServerLevel level, ServerPlayer player,
                                      BlockPos pos, ItemStack tool, int fortuneLevel, boolean silk) {
@@ -90,9 +96,9 @@ public class DestroyBlock {
                     BlockPos target;
                     switch (facing) {
                         case NORTH -> target = base.offset(dx, dy, -dz);
-                        case WEST  -> target = base.offset(-dz, dy, dx);
-                        case EAST  -> target = base.offset(dz, dy, dx);
-                        default    -> target = base.offset(dx, dy, dz);
+                        case WEST -> target = base.offset(-dz, dy, dx);
+                        case EAST -> target = base.offset(dz, dy, dx);
+                        default -> target = base.offset(dx, dy, dz);
                     }
 
                     doBreakBlock(level, player, target, tool, fortuneLevel, silk);

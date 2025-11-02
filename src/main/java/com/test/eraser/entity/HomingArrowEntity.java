@@ -19,13 +19,14 @@ import java.util.Comparator;
 import java.util.List;
 
 public class HomingArrowEntity extends AbstractArrow {//90% ChatGPT Lawl   if(!mybrain.know(HomingArrowEntity)) ChatGPTAPI.GenerateResponce("pls Create HomingArrowEntity Class.");
+
+    private static final double SEARCH_RADIUS = 32.0;
+    private static final double MAX_ANGLE_DEGREES = 25.0; //Homing Fov
+    private static final double MAX_ANGLE_COS = Math.cos(Math.toRadians(MAX_ANGLE_DEGREES));
+    private LivingEntity homingTarget;
+
     public HomingArrowEntity(EntityType<? extends HomingArrowEntity> type, Level level) {
         super(type, level);
-    }
-
-    @Override
-    protected ItemStack getPickupItem() {
-        return ItemStack.EMPTY;
     }
 
     public HomingArrowEntity(Level level, LivingEntity shooter) {
@@ -57,10 +58,10 @@ public class HomingArrowEntity extends AbstractArrow {//90% ChatGPT Lawl   if(!m
         return Math.acos(dot);
     }
 
-    private LivingEntity homingTarget;
-    private static final double SEARCH_RADIUS = 32.0;
-    private static final double MAX_ANGLE_DEGREES = 25.0; //Homing Fov
-    private static final double MAX_ANGLE_COS = Math.cos(Math.toRadians(MAX_ANGLE_DEGREES));
+    @Override
+    protected ItemStack getPickupItem() {
+        return ItemStack.EMPTY;
+    }
 
     @Override
     public void tick() {
@@ -210,7 +211,7 @@ public class HomingArrowEntity extends AbstractArrow {//90% ChatGPT Lawl   if(!m
                         || off.getItem() instanceof com.test.eraser.Items.Eraser_Item;
         if (!shooterHasEraser) return;*/
 
-        if(hit instanceof LivingEntity living)if (living instanceof ILivingEntity hit_)hit_.toolinstantKill();
+        if (hit instanceof LivingEntity living) if (living instanceof ILivingEntity hit_) hit_.toolinstantKill();
         this.remove(RemovalReason.KILLED);
     }
 
