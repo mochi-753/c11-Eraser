@@ -28,7 +28,6 @@ public class Eraser {
 
     public Eraser() {
         MinecraftForge.EVENT_BUS.register(this);
-        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
         var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
         ModItems.ITEMS.register(modEventBus);
         ModCreativeTabs.TABS.register(modEventBus);

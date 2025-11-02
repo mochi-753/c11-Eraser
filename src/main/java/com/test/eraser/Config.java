@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Mod.EventBusSubscriber(modid = Eraser.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+/*@Mod.EventBusSubscriber(modid = Eraser.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Config {
     private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC = BUILDER.build();
@@ -31,4 +31,4 @@ public class Config {
                 .map(name -> ForgeRegistries.ITEMS.getValue(ResourceLocation.parse(name)))
                 .collect(Collectors.toSet());
     }
-}
+}*/
