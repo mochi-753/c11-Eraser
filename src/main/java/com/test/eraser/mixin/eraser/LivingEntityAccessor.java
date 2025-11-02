@@ -16,6 +16,12 @@ public interface LivingEntityAccessor {
     @Accessor("lastHurtByPlayer")
     void setLastHurtByPlayer(Player player);
 
+    @Accessor("lastHurtByPlayerTime")
+    int getLastHurtByPlayerTime();
+
+    @Accessor("lastHurtByPlayerTime")
+    void setLastHurtByPlayerTime(int time);
+
     @Accessor("DATA_HEALTH_ID")
     static EntityDataAccessor<Float> getDataHealthId() {
         throw new AssertionError();
