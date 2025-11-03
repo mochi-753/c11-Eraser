@@ -10,6 +10,7 @@
     "client.ItemRendererMixin",
     "client.ItemStackDisplayMixin",
     "client.SetScreenMixin",
+    "client.ClientLevelAccessor",
     "snackprotector.GameRendererMixin"
   ],
   "mixins": [
@@ -22,6 +23,7 @@
     "eraser.ClassInstanceMultiMapAccessor",
     "eraser.EntitySectionAccessor",
     "eraser.LivingEntityAccessor",
+    "eraser.TransientEntitySectionManagerAccessor",
     "eraser.SynchedEntityDataAccessor",
     "snackprotector.LivingEntityMixin"
   ],

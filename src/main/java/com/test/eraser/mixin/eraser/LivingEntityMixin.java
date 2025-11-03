@@ -15,12 +15,8 @@ import net.minecraft.util.ClassInstanceMultiMap;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.entity.EntitySection;
-import net.minecraft.world.level.entity.EntitySectionStorage;
-import net.minecraft.world.level.entity.EntityTickList;
-import net.minecraft.world.level.entity.PersistentEntitySectionManager;
+import net.minecraft.world.level.entity.*;
 import net.minecraft.world.phys.AABB;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -34,6 +30,7 @@ import java.lang.reflect.Method;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Mixin(LivingEntity.class)
 public abstract class LivingEntityMixin implements ILivingEntity {
@@ -62,27 +59,12 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     public void setwassFullset(boolean Fullset) {
         this.Fullset = Fullset;
     }
-    /*@Override
-    public void instantKill(Player attacker) {
-        LivingEntity self = (LivingEntity) (Object) this;
-        if (self.level().isClientSide() || !self.isAlive()) return;
-        ServerLevel dest = self.getServer().getLevel(Level.OVERWORLD);
-        if (dest == null) return;
-        if (self.level().isClientSide()) return;
-
-        if (self instanceof ILivingEntity ile) {
-            ile.setPendingAttacker(attacker);
-            ile.setPendingEraseOnChangeDim(true);
-        }
-
-        Entity moved = self.changeDimension(dest);
-    }*/
 
     @Override
     public void instantKill(Player attacker, @Nullable int moredrop) {
         LivingEntity self = (LivingEntity) (Object) this;
         if (!self.isAlive()) return;
-
+        this.setErased(true);
         List<Entity> nearby = self.level().getEntities(self, self.getBoundingBox().inflate(32));
         for (Entity e : nearby) {
             try {
@@ -93,7 +75,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
                         if (part == self) {
                             if (e instanceof LivingEntity parent && parent instanceof ILivingEntity erasedParent) {
                                 erasedParent.instantKill(attacker, moredrop);
-                                //return;
+                                return;
                             }
                         }
                     }
@@ -103,9 +85,6 @@ public abstract class LivingEntityMixin implements ILivingEntity {
                 ex.printStackTrace();
             }
         }
-
-        //if (this.isErased()) return;
-        this.setErased(true);
 
         DamageSource eraseSrc = ModDamageSources.erase(self, attacker);
         try {
@@ -168,24 +147,31 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         self.stopRiding();
         self.onRemovedFromWorld();
         self.invalidateCaps();
-        if (self instanceof Mob mob) {
+       /* if (self instanceof Mob mob) {
             mob.setNoAi(true);
             mob.goalSelector.getAvailableGoals().clear();
             mob.targetSelector.getAvailableGoals().clear();
-        }
+        }*/
         self.setBoundingBox(new AABB(0, 0, 0, 0, 0, 0));
         EntityTickList tickList = ((ServerLevelAccessor) serverLevel).getEntityTickList();
         tickList.remove(self);
-        ClientboundRemoveEntitiesPacket packet =
+        /*ClientboundRemoveEntitiesPacket packet =
                 new ClientboundRemoveEntitiesPacket(new int[]{self.getId()});
         for (ServerPlayer sp : serverLevel.players()) {
             sp.connection.send(packet);
-        }
+        }*/
         PersistentEntitySectionManager<Entity> manager =
                 ((ServerLevelAccessor) serverLevel).getEntityManager();
         EntitySectionStorage<Entity> storage =
                 ((PersistentEntitySectionManagerAccessor) manager).getSectionStorage();
 
+        ((PersistentEntitySectionManagerAccessor<Entity>) manager)
+                .getCallbacks()
+                .onDestroyed(self);
+        EntityLookup<Entity> lookup =
+                ((PersistentEntitySectionManagerAccessor<Entity>) manager).getVisibleEntityStorage();
+        lookup.remove(self);
+        self.setLevelCallback(EntityInLevelCallback.NULL);
         long sectionKey = SectionPos.asLong(self.blockPosition());
         EntitySection<Entity> section = storage.getSection(sectionKey);
         if (section != null) {
@@ -203,22 +189,24 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         if (serverLevel.getEntity(self.getId()) != null) {
             System.err.println("[EraserMod] failed to fully remove entity id=" + self.getId());
         }
-
+        //self.onRemovedFromWorld();
+        //self.onRemovedFromWorld();
     }
+
 
     @Inject(method = "getHealth", at = @At("HEAD"), cancellable = true)
     private void overrideGetHealth(CallbackInfoReturnable<Float> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
-        if (isErased() && self instanceof Player player && !SnackArmor.SnackProtector.isFullSet(player)) {
+        if (this.isErased() || (this.isErased() && self instanceof Player player && !SnackArmor.SnackProtector.isFullSet(player))) {
             cir.setReturnValue(0.0F);
         }
     }
 
     @Inject(method = "getMaxHealth", at = @At("HEAD"), cancellable = true)
-    private void eraser$getMaxHealth(CallbackInfoReturnable<Float> cir) {
+    private void overridegetMaxHealth(CallbackInfoReturnable<Float> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
 
-        if (isErased() && self instanceof Player player && !SnackArmor.SnackProtector.isFullSet(player)) {
+        if (this.isErased() || (this.isErased() && self instanceof Player player && !SnackArmor.SnackProtector.isFullSet(player))) {
             cir.setReturnValue(0F);
         }
     }
@@ -250,7 +238,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             cir.setReturnValue(true);
             return;
         }
-        if (isErased()) {
+        if (this.isErased()) {
             cir.setReturnValue(false);
         }
     }
@@ -258,7 +246,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     @Inject(method = "isDeadOrDying", at = @At("HEAD"), cancellable = true)
     private void eraser$isDeadOrDying(CallbackInfoReturnable<Boolean> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
-        if (isErased() && self instanceof Player player && !SnackArmor.SnackProtector.isFullSet(player)) {
+        if (this.isErased() || (this.isErased() && self instanceof Player player && !SnackArmor.SnackProtector.isFullSet(player))) {
             cir.setReturnValue(true);
         }
     }
@@ -269,8 +257,9 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         if (isErased()) {
             self.setBoundingBox(new AABB(self.getX(), self.getY(), self.getZ(),
                     self.getX(), self.getY(), self.getZ()));
-            ci.cancel();
+            //ci.cancel();
         }
     }
 }
+
 

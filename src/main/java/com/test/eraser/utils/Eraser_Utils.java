@@ -1,9 +1,12 @@
 package com.test.eraser.utils;
 
 import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.mixin.eraser.TransientEntitySectionManagerAccessor;
+import net.minecraft.core.SectionPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.entity.*;
 import net.minecraft.world.phys.AABB;
 
 import java.lang.reflect.Method;
@@ -69,4 +72,34 @@ public class Eraser_Utils {
         return false;
     }
 
+    public static void forceRemoveTransient(TransientEntitySectionManager<Entity> manager, Entity entity) {
+        long sectionKey = SectionPos.asLong(entity.blockPosition());
+        EntitySectionStorage<Entity> storage =
+                ((TransientEntitySectionManagerAccessor<Entity>) manager).getSectionStorage();
+
+        EntitySection<Entity> section = storage.getSection(sectionKey);
+
+        if (section != null) {
+            section.remove(entity);
+
+            ((TransientEntitySectionManagerAccessor<Entity>) manager)
+                    .invokeRemoveSectionIfEmpty(sectionKey, section);
+        }
+
+        Visibility visibility = section != null ? section.getStatus() : Visibility.TRACKED;
+
+        LevelCallback<Entity> callbacks =
+                ((TransientEntitySectionManagerAccessor<Entity>) manager).getCallbacks();
+
+        if (visibility.isTicking() || entity.isAlwaysTicking()) {
+            callbacks.onTickingEnd(entity);
+        }
+        callbacks.onTrackingEnd(entity);
+        callbacks.onDestroyed(entity);
+
+        ((TransientEntitySectionManagerAccessor<Entity>) manager)
+                .getSectionStorage().remove(sectionKey);
+
+        entity.setLevelCallback(EntityInLevelCallback.NULL);
+    }
 }

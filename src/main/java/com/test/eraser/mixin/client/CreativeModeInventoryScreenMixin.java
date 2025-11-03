@@ -1,5 +1,7 @@
 package com.test.eraser.mixin.client;
 
+import com.test.eraser.additional.ModCreativeTabs;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.gui.screens.inventory.CreativeModeInventoryScreen;
@@ -17,8 +19,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public abstract class CreativeModeInventoryScreenMixin
         extends AbstractContainerScreen<CreativeModeInventoryScreen.ItemPickerMenu> {
 
-    public CreativeModeInventoryScreenMixin(CreativeModeInventoryScreen.ItemPickerMenu menu,
-                                            Inventory inv, Component title) {
+    public CreativeModeInventoryScreenMixin(CreativeModeInventoryScreen.ItemPickerMenu menu, Inventory inv, Component title) {
         super(menu, inv, title);
     }
 
@@ -35,16 +36,13 @@ public abstract class CreativeModeInventoryScreenMixin
     @Inject(method = "renderLabels(Lnet/minecraft/client/gui/GuiGraphics;II)V", at = @At("HEAD"), cancellable = true)
     private void injectRenderLabels(GuiGraphics guiGraphics, int mouseX, int mouseY, CallbackInfo ci) {
         CreativeModeTab currentTab = CreativeModeInventoryScreenAccess.getSelectedTab();
-        return;/*
         if (currentTab == null || !ModCreativeTabs.ERASER_TAB.isPresent()) return;
         if (currentTab != ModCreativeTabs.ERASER_TAB.get()) return;
 
         ci.cancel();
 
         if (currentTab.showTitle()) {
-            long time = Minecraft.getInstance().level != null
-                    ? Minecraft.getInstance().level.getGameTime()
-                    : 0;
+            long time = Minecraft.getInstance().level.getGameTime();
             String text = currentTab.getDisplayName().getString();
             int x = 8;
             int y = 6;
@@ -55,7 +53,7 @@ public abstract class CreativeModeInventoryScreenMixin
                 guiGraphics.drawString(this.font, String.valueOf(c), x, y, color, false);
                 x += this.font.width(String.valueOf(c));
             }
-        }*/
+        }
     }
 }
 
