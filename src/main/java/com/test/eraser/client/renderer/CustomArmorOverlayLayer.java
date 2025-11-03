@@ -3,6 +3,7 @@ package com.test.eraser.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.test.eraser.additional.SnackArmor;
+import com.test.eraser.utils.Res;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -17,7 +18,7 @@ public class CustomArmorOverlayLayer<T extends LivingEntity, M extends HumanoidM
         extends RenderLayer<T, M> {
 
     private static final ResourceLocation OVERLAY =
-            new ResourceLocation("eraser", "textures/misc/noise_overlay.png");
+            Res.getResource("eraser", "textures/misc/noise_overlay.png");
 
     public CustomArmorOverlayLayer(RenderLayerParent<T, M> parent) {
         super(parent);

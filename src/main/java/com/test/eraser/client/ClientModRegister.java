@@ -5,6 +5,7 @@ import com.test.eraser.additional.ModEntities;
 import com.test.eraser.additional.ModKeyBindings;
 import com.test.eraser.client.renderer.SandBagRenderer;
 import com.test.eraser.entity.HomingArrowEntity;
+import com.test.eraser.utils.Res;
 import net.minecraft.client.renderer.entity.ArrowRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -22,7 +23,7 @@ public class ClientModRegister {
                 context -> new ArrowRenderer<HomingArrowEntity>(context) {
                     @Override
                     public ResourceLocation getTextureLocation(HomingArrowEntity entity) {
-                        return new ResourceLocation("minecraft", "textures/entity/projectiles/arrow.png");
+                        return  Res.getResource("minecraft", "textures/entity/projectiles/arrow.png");
                     }
                 });
 

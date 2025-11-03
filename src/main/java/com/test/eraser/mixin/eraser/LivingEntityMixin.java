@@ -15,6 +15,7 @@ import net.minecraft.util.ClassInstanceMultiMap;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.entity.*;
 import net.minecraft.world.phys.AABB;
@@ -122,6 +123,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             }
             ((LivingEntityAccessor) self).invokeDropAllDeathLoot(source);
         }
+        self.setPose(Pose.DYING);
     }
 
     @Override

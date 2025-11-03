@@ -3,6 +3,7 @@ package com.test.eraser.client.renderer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.test.eraser.client.utils.RenderUtils;
+import com.test.eraser.utils.Res;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.resources.ResourceLocation;
@@ -14,7 +15,7 @@ import java.util.List;
 
 public class ShieldEffectRenderer {
     private static final ResourceLocation NOISE_TEXTURE =
-            new ResourceLocation("eraser", "textures/misc/noise_overlay.png");
+            Res.getResource("eraser", "textures/misc/noise_overlay.png");
 
     private static final List<ShieldInstance> activeShields = new ArrayList<>();
 

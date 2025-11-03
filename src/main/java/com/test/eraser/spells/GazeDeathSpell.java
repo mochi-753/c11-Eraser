@@ -1,6 +1,7 @@
 package com.test.eraser.spells;
 
 import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.utils.Res;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
 import io.redspace.ironsspellbooks.api.registry.SchoolRegistry;
@@ -117,6 +118,6 @@ public class GazeDeathSpell extends AbstractSpell {
 
     @Override
     public ResourceLocation getSpellResource() {
-        return new ResourceLocation("eraser", "gaze_death");
+        return  Res.getResource("eraser", "gaze_death");
     }
 }
