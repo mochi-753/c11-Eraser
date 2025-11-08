@@ -25,6 +25,9 @@
     "eraser.LivingEntityAccessor",
     "eraser.TransientEntitySectionManagerAccessor",
     "eraser.SynchedEntityDataAccessor",
+    "eraser.EntityTickListAccessor",
+    "eraser.EntityLookupAccessor",
+    "eraser.LevelEntityGetterAdapterAccessor",
     "snackprotector.LivingEntityMixin"
   ],
   "injectors": { "defaultRequire": 1 }

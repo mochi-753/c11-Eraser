@@ -62,13 +62,13 @@ public class Eraser_Utils {
         if (opt.isPresent()) {
             try {
                 if (attacker instanceof Player player)
-                    opt.get().instantKill(player, moredrop);
+                    opt.get().instantKill(player);
                 return true;
             } catch (Exception ex) {
                 ex.printStackTrace();
             }
         }
-        if (self instanceof ILivingEntity living) living.instantKill((Player) attacker, moredrop);
+        if (self instanceof ILivingEntity living) living.instantKill((Player) attacker);
         return false;
     }
 

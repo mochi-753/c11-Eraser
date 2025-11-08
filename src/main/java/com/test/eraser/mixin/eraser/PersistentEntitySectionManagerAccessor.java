@@ -4,6 +4,9 @@ import net.minecraft.world.level.entity.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
+import java.util.Set;
+import java.util.UUID;
+
 @Mixin(PersistentEntitySectionManager.class)
 public interface PersistentEntitySectionManagerAccessor<T extends EntityAccess> {
     @Accessor("sectionStorage")
@@ -15,5 +18,10 @@ public interface PersistentEntitySectionManagerAccessor<T extends EntityAccess> 
     @Accessor("visibleEntityStorage")
     EntityLookup<T> getVisibleEntityStorage();
 
+    @Accessor("knownUuids")
+    Set<UUID> getKnownUuids();
+
+    @Accessor("entityGetter")
+    LevelEntityGetter<T> getEntityGetter();
 }
 

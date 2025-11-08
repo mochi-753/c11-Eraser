@@ -58,7 +58,7 @@ public class GazeDeathSpell extends AbstractSpell {
             case 3 -> {
                 if (target instanceof ILivingEntity erased) {
                     if (caster instanceof net.minecraft.world.entity.player.Player p) {
-                        erased.instantKill(p, 1);
+                        erased.instantKill(p);
                     } else {
                         erased.instantKill();
                     }

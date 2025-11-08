@@ -13,7 +13,7 @@ public class PersistentEntitySectionManagerMixin {
     @Inject(method = "addEntityUuid", at = @At("HEAD"), cancellable = true)
     private void onAddEntityUuid(Entity entity, CallbackInfoReturnable<Boolean> cir) {
         if (entity instanceof ILivingEntity erase && erase.isErased()) {
-            cir.setReturnValue(false);
+            //cir.setReturnValue(false);
         }
     }
 }

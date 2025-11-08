@@ -35,7 +35,7 @@ public class EraserRangeAttackPacket {
                 );
 
                 for (LivingEntity target : targets) {
-                    if (target instanceof ILivingEntity target_) target_.toolinstantKill();
+                    if (target instanceof ILivingEntity target_) target_.instantKill(player);
                 }
             }
         });

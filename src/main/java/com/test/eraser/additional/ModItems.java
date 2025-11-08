@@ -34,33 +34,6 @@ public class ModItems {
 
     public static final RegistryObject<Item> SNACK_BOOTS =
             ITEMS.register("snack_protect_boots", () -> new Snack_Boots());
-    /*public static final RegistryObject<Item> GAZE_DEATH_SCROLL_1 =
-            ITEMS.register("gaze_death_scroll_1",
-                    () -> new GazeDeathScroll_Item(
-                            new Item.Properties()
-                                    .stacksTo(16)
-                                    .rarity(net.minecraft.world.item.Rarity.RARE),
-                            1
-                    )
-            );
-    public static final RegistryObject<Item> GAZE_DEATH_SCROLL_2 =
-            ITEMS.register("gaze_death_scroll_2",
-                    () -> new GazeDeathScroll_Item(
-                            new Item.Properties()
-                                    .stacksTo(16)
-                                    .rarity(net.minecraft.world.item.Rarity.RARE),
-                            2
-                    )
-            );
-    public static final RegistryObject<Item> GAZE_DEATH_SCROLL_3 =
-            ITEMS.register("gaze_death_scroll_3",
-                    () -> new GazeDeathScroll_Item(
-                            new Item.Properties()
-                                    .stacksTo(16)
-                                    .rarity(net.minecraft.world.item.Rarity.RARE),
-                            3
-                    )
-            );*/
 
     public static List<Item> getAllItems() {
         return ITEMS.getEntries().stream()

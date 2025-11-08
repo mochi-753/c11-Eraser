@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import com.test.eraser.additional.*;
 import com.test.eraser.network.PacketHandler;
 import net.minecraft.client.Minecraft;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.PackOutput;
 import net.minecraftforge.api.distmarker.Dist;
@@ -20,6 +21,9 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
+
+import java.util.concurrent.CompletableFuture;
+
 @SuppressWarnings("removal")
 @Mod(Eraser.MODID)
 public class Eraser {
@@ -50,18 +54,18 @@ public class Eraser {
         LOGGER.info("HELLO from server starting");
     }
 
-    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class DataGenEvents {
-        @SubscribeEvent
-        public static void gatherData(GatherDataEvent event) {
-            DataGenerator generator = event.getGenerator();
-            PackOutput output = generator.getPackOutput();
-            ExistingFileHelper helper = event.getExistingFileHelper();
+    @SubscribeEvent
+    public static void gatherData(GatherDataEvent event) {
+        PackOutput output = event.getGenerator().getPackOutput();
+        CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
+        ExistingFileHelper helper = event.getExistingFileHelper();
 
-            generator.addProvider(event.includeServer(),
-                    new ModDamageTypeTags(output, event.getLookupProvider(), helper));
+        if (event.includeServer()) {
+            event.getGenerator().addProvider(true, new ModDamageTypeTags(output, lookupProvider, helper));
         }
     }
+
+
 
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
     public static class ClientModEvents {

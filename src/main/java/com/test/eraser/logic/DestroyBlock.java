@@ -1,8 +1,11 @@
 package com.test.eraser.logic;
 
 import com.test.eraser.utils.DestroyMode;
+import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -16,7 +19,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
 
 public class DestroyBlock {
 
@@ -105,6 +112,80 @@ public class DestroyBlock {
                 }
             }
         }
+    }
+
+    public static void breakSameId(ServerLevel level, ServerPlayer player, BlockPos center,
+                                   ItemStack tool, int fortuneLevel, boolean silk, int maxCount,
+                                   Predicate<BlockState> accept) {
+        BlockState originState = level.getBlockState(center);
+        if (originState.isAir()) return;
+
+        Deque<BlockPos> queue = new ArrayDeque<>();
+        Set<Long> visited = new LongOpenHashSet();
+
+        queue.add(center);
+        visited.add(center.asLong());
+
+        int destroyed = 0;
+
+        while (!queue.isEmpty() && destroyed < maxCount) {
+            BlockPos pos = queue.pollFirst();
+            BlockState state = level.getBlockState(pos);
+
+            if (state.isAir()) continue;
+            if (!accept.test(state)) continue;
+
+            doBreakBlock(level, player, pos, tool, fortuneLevel, silk);
+            destroyed++;
+            if (destroyed >= maxCount) break;
+
+            for (Direction dir : Direction.values()) {
+                BlockPos next = pos.relative(dir);
+                long key = next.asLong();
+                if (visited.contains(key)) continue;
+                visited.add(key);
+                queue.addLast(next);
+            }
+        }
+    }
+
+    public static void breakSameIdById(ServerLevel level, ServerPlayer player, BlockPos center,
+                                       ItemStack tool, int fortuneLevel, boolean silk, int maxCount,
+                                       ResourceLocation blockId) {
+        Block target = BuiltInRegistries.BLOCK.get(blockId);
+        if (target == null || target == Blocks.AIR) return;
+
+        breakSameId(level, player, center, tool, fortuneLevel, silk, maxCount,
+                state -> state.getBlock() == target);
+    }
+
+    public static void breakSameIdByIdNormal(ServerLevel level, ServerPlayer player, BlockPos center,
+                                             ItemStack tool, ResourceLocation blockId) {
+        breakSameIdById(level, player, center, tool, 0, false, 32, blockId);
+    }
+
+    public static void breakSameIdByIdFortune(ServerLevel level, ServerPlayer player, BlockPos center,
+                                              ItemStack tool, int fortuneLevel, ResourceLocation blockId) {
+        breakSameIdById(level, player, center, tool, fortuneLevel, false, 32, blockId);
+    }
+
+    public static void breakSameIdByIdSilk(ServerLevel level, ServerPlayer player, BlockPos center,
+                                           ItemStack tool, ResourceLocation blockId) {
+        breakSameIdById(level, player, center, tool, 0, true, 32, blockId);
+    }
+    public static void breakSameIdNormal(ServerLevel level, ServerPlayer player, BlockPos center, ItemStack tool) {
+        breakSameId(level, player, center, tool, 0, false, 32,
+                state -> state.getBlock() == level.getBlockState(center).getBlock());
+    }
+
+    public static void breakSameIdFortune(ServerLevel level, ServerPlayer player, BlockPos center, ItemStack tool, int fortuneLevel) {
+        breakSameId(level, player, center, tool, fortuneLevel, false, 32,
+                state -> state.getBlock() == level.getBlockState(center).getBlock());
+    }
+
+    public static void breakSameIdSilk(ServerLevel level, ServerPlayer player, BlockPos center, ItemStack tool) {
+        breakSameId(level, player, center, tool, 0, true, 32,
+                state -> state.getBlock() == level.getBlockState(center).getBlock());
     }
 
 }

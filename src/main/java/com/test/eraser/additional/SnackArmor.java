@@ -18,7 +18,7 @@ public class SnackArmor {
     public static final ArmorMaterial SNACK_MATERIAL = new ArmorMaterial() {
         @Override
         public int getDurabilityForType(Type type) {
-            return 9999;
+            return 0;
         }
 
         @Override
@@ -85,6 +85,7 @@ public class SnackArmor {
     public static class SnackProtector {
 
         public static boolean isFullSet(Player player) {
+            if(player == null || player.getInventory() == null) return false;
             ItemStack head = player.getInventory().armor.get(3);
             ItemStack chest = player.getInventory().armor.get(2);
             ItemStack legs = player.getInventory().armor.get(1);
@@ -169,14 +170,14 @@ public class SnackArmor {
             player.getFoodData().setFoodLevel(20);
             player.getFoodData().setSaturation(20.0F);
             player.setHealth(player.getMaxHealth());
-            if (player instanceof ILivingEntity Iliving) Iliving.setwassFullset(true);
+            if (player instanceof ILivingEntity Iliving) Iliving.setwasFullset(true);
         }
 
         private static void resetAbilities(Player player) {
             player.getAbilities().mayfly = false;
             player.getAbilities().invulnerable = false;
             player.onUpdateAbilities();
-            if (player instanceof ILivingEntity Iliving) Iliving.setwassFullset(false);
+            if (player instanceof ILivingEntity Iliving) Iliving.setwasFullset(false);
         }
 
         @SubscribeEvent

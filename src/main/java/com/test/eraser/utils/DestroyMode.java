@@ -7,10 +7,12 @@ public enum DestroyMode {
     NORMAL(1, 1, 1, 0),
     SMALL(1, 2, 2, 0),
     CUBE(3, 3, 3, 0),
-    TUNNEL(3, 3, 7, 0);
+    TUNNEL(3, 3, 7, 0),
+    SAME_ID(1, 1, 1, 0),
+    SAME_ID_ORE(1, 1, 1, 0);
 
     private static final String KEY = "WorldDestroyerMode";
-    private static final String SILK_KEY = "SilkTouchEnabled"; // ← 追加
+    private static final String SILK_KEY = "SilkTouchEnabled";
     public final int x, y, z;
     public final int yOffset;
     DestroyMode(int x, int y, int z, int yOffset) {

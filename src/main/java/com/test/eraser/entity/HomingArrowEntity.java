@@ -211,7 +211,7 @@ public class HomingArrowEntity extends AbstractArrow {//90% ChatGPT Lawl   if(!m
                         || off.getItem() instanceof com.test.eraser.Items.Eraser_Item;
         if (!shooterHasEraser) return;*/
 
-        if (hit instanceof LivingEntity living) if (living instanceof ILivingEntity hit_) hit_.toolinstantKill();
+        if (hit instanceof LivingEntity living) if (living instanceof ILivingEntity hit_) hit_.instantKill((Player)this.getOwner());
         this.remove(RemovalReason.KILLED);
     }
 
