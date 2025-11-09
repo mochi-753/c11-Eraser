@@ -1,5 +1,6 @@
 package com.test.eraser.mixin.eraser;
 
+import com.test.eraser.Config;
 import com.test.eraser.logic.ILivingEntity;
 import com.test.eraser.utils.EraseEntityLookupBridge;
 import com.test.eraser.utils.SynchedEntityDataUtil;
@@ -41,7 +42,7 @@ public class ChunkSerializerMixin {
         });
         acc.getKnownUuids().removeIf(uuid -> {
             Entity e = level.getEntity(uuid);
-            if((e instanceof ILivingEntity living) && living.isErased()) System.out.println("[Eraser] Removed entity UUID from knownUuids: " + uuid);
+            if((e instanceof ILivingEntity living) && living.isErased() && !Config.isNormalDieEntity(e)) System.out.println("[Eraser] Removed entity UUID from knownUuids: " + uuid);
             return (e instanceof ILivingEntity living) && living.isErased();
         });
 

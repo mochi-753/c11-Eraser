@@ -17,7 +17,7 @@ public class ClientPacketHandler {
         if (level != null) {
             Entity e = level.getEntity(msg.entityId);
             if (e instanceof ILivingEntity erased) {
-                erased.setErased(true);
+                //erased.setErased(true);
                 erased.eraseClientEntity((LivingEntity) e);
             }
         }

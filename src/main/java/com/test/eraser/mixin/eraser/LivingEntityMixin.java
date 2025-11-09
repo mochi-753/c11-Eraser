@@ -19,6 +19,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.ClassInstanceMultiMap;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -86,16 +87,16 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     public void instantKill(Player attacker) {
         LivingEntity self = (LivingEntity) (Object) this;
 
-        if (self.level().isClientSide || this.isErased()) return;
-        this.setErased(true);
+        if (this.isErased()) return;
         DamageSource eraseSrc = ModDamageSources.erase(self, attacker);
         EntityDataAccessor<Float> healthId = LivingEntityAccessor.getDataHealthId();
+        //self.hurt(eraseSrc,Float.MAX_VALUE);
         SynchedEntityDataUtil.forceSet(self.getEntityData(), healthId, 0.0F);
         ((LivingEntityAccessor) self).setLastHurtByPlayer(attacker);
         ((LivingEntityAccessor) self).setLastHurtByPlayerTime((int)Instant.now().getEpochSecond());
         self.getCombatTracker().recordDamage(eraseSrc, Float.MAX_VALUE);
 
-        if (Config.isNormalDieEntity(self)) {}
+        if (Config.isNormalDieEntity(self)) {self.die(eraseSrc);}
         else if (Config.FORCE_DIE.get()) {
             forcedie(eraseSrc);
             if (!(self instanceof ServerPlayer)/* && !self.isDeadOrDying()*/)
@@ -113,10 +114,16 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         ((LivingEntityAccessor) self).setDeadFlag(true);
         //self.deathTime = 1;
         if (!self.level().isClientSide) {
+            this.setErased(true);
             if (self instanceof ServerPlayer sp) {
                 Component deathMsg = sp.getCombatTracker().getDeathMessage();
                 sp.connection.send(new ClientboundPlayerCombatKillPacket(sp.getId(), deathMsg));
                 if (self.isDeadOrDying()) sp.server.getPlayerList().broadcastSystemMessage(deathMsg, false);
+            }
+            LivingEntity killer = self.getKillCredit();
+            if (killer != null) {
+                if(self.getKillCredit() instanceof ServerPlayer player)player.awardStat(Stats.ENTITY_KILLED_BY.get(killer.getType()));
+                killer.awardKillScore(self, 0, source);
             }
             //((LivingEntityAccessor) self).invokeDropAllDeathLoot(source);
             ((LivingEntityAccessor)self).invokedropFromLootTable(source,false);
