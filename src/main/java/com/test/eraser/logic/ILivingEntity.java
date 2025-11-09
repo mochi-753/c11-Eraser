@@ -1,5 +1,6 @@
 package com.test.eraser.logic;
 
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
 import javax.annotation.Nullable;
@@ -26,4 +27,5 @@ public interface ILivingEntity {
 
     boolean isErased(UUID uuid);
 
+    void eraseClientEntity(LivingEntity self);
 }

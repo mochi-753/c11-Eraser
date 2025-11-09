@@ -2,6 +2,7 @@ package com.test.eraser;
 
 import com.mojang.logging.LogUtils;
 import com.test.eraser.additional.*;
+import com.test.eraser.network.ModPackets;
 import com.test.eraser.network.PacketHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.HolderLookup;
@@ -32,48 +33,26 @@ public class Eraser {
 
     public Eraser() {
         MinecraftForge.EVENT_BUS.register(this);
+
         var modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+
         ModItems.ITEMS.register(modEventBus);
         ModCreativeTabs.TABS.register(modEventBus);
         ModEntities.ENTITIES.register(modEventBus);
         modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(this::clientSetup);
+
         if (ModList.get().isLoaded("ironsspellbooks")) {
             ModSpells.register(modEventBus);
         }
-
-        //SchoolRegistry.register(modEventBus);
     }
 
     private void commonSetup(final FMLCommonSetupEvent event) {
-        PacketHandler.init();
-        LOGGER.info("PacketHandler initialized");
+        ModPackets.register();
     }
 
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event) {
-        LOGGER.info("HELLO from server starting");
-    }
-
-    @SubscribeEvent
-    public static void gatherData(GatherDataEvent event) {
-        PackOutput output = event.getGenerator().getPackOutput();
-        CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
-        ExistingFileHelper helper = event.getExistingFileHelper();
-
-        if (event.includeServer()) {
-            event.getGenerator().addProvider(true, new ModDamageTypeTags(output, lookupProvider, helper));
-        }
-    }
-
-
-
-    @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public static class ClientModEvents {
-        @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event) {
-            LOGGER.info("HEHEHE");
-            LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
-        }
+    private void clientSetup(final FMLClientSetupEvent event) {
     }
 }

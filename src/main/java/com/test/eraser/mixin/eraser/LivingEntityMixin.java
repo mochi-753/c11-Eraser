@@ -1,5 +1,6 @@
 package com.test.eraser.mixin.eraser;
 
+import com.test.eraser.Config;
 import com.test.eraser.additional.ModDamageSources;
 import com.test.eraser.additional.SnackArmor;
 import com.test.eraser.logic.ILivingEntity;
@@ -9,8 +10,6 @@ import com.test.eraser.utils.EraseEntityLookupBridge;
 import com.test.eraser.utils.SynchedEntityDataUtil;
 import com.test.eraser.utils.TaskScheduler;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.SectionPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket;
@@ -96,11 +95,12 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         ((LivingEntityAccessor) self).setLastHurtByPlayerTime((int)Instant.now().getEpochSecond());
         self.getCombatTracker().recordDamage(eraseSrc, Float.MAX_VALUE);
 
-        //if (Config.isNormalDieEntity(self)) {}
-        //else if (Config.FORCE_DIE.get()) {
-        forcedie(eraseSrc);
-        if (!(self instanceof ServerPlayer)/* && !self.isDeadOrDying()*/) TaskScheduler.schedule(this::forceErase, 19);
-        //}
+        if (Config.isNormalDieEntity(self)) {}
+        else if (Config.FORCE_DIE.get()) {
+            forcedie(eraseSrc);
+            if (!(self instanceof ServerPlayer)/* && !self.isDeadOrDying()*/)
+                TaskScheduler.schedule(this::forceErase, 19);
+        }
         //ServerLevel dest = self.getServer().getLevel(Level.OVERWORLD);
         //if (dest == null) return;
         //Entity moved = self.changeDimension(dest);//for muteki star
@@ -135,7 +135,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         LivingEntity self = (LivingEntity) (Object) this;
         markErased(self.getUUID());
         self.setPosRaw(Double.NaN, Double.NaN, Double.NaN);
-        ((EntityAccessor)self).setRemovalReason(Entity.RemovalReason.KILLED);
+        ((EntityAccessor) self).setRemovalReason(Entity.RemovalReason.KILLED);
         self.setRemoved(Entity.RemovalReason.KILLED);
         if (self.level() instanceof ServerLevel serverLevel) {
             self.stopRiding();
@@ -179,7 +179,8 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             long sectionKey = SectionPos.asLong(self.blockPosition());
             EntitySection<Entity> section = storage.getSection(sectionKey);
             if (section != null) {
-                ((EntitySectionAccessor)section).getStorage().remove(self);;
+                ((EntitySectionAccessor) section).getStorage().remove(self);
+                ;
                 ClassInstanceMultiMap<Entity> multiMap = ((EntitySectionAccessor<Entity>) section).getStorage();
                 Map<Class<?>, List<Entity>> byClass = ((ClassInstanceMultiMapAccessor<Entity>) multiMap).getByClass();
                 hardRemove(self, byClass);
@@ -187,36 +188,17 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             }
             ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
             Int2ObjectMap<?> entityMap = ((ChunkMapAccessor) chunkMap).getEntityMap();
-            Object tracked = entityMap.remove(self.getId());
-            if (tracked instanceof TrackedEntityAccessor accessor) {
+            entityMap.remove(self.getId());
+            if (self instanceof TrackedEntityAccessor accessor) {
                 accessor.invokeBroadcastRemoved();
             }
             if (serverLevel.getEntity(self.getUUID()) != null && vis.getEntity(self.getUUID()) != null && vis2.getEntity(self.getUUID()) != null && acc.getKnownUuids().contains(self.getUUID()) && ((EntitySectionAccessor<?>) section2).getStorage().contains(self)) {
                 System.err.println("[EraserMod] failed to fully remove entity id=" + self.getId());
-            }
-            else {
+            } else {
                 System.out.println("[EraserMod] successfully removed entity id=" + self.getId());
             }
         }
 
-        Minecraft mc = Minecraft.getInstance();
-        if (mc != null && mc.player != null && mc.player.level() instanceof ClientLevel clientLevel) {
-            TransientEntitySectionManager<Entity> tManager = ((ClientLevelAccessor) clientLevel).getTransientEntityManager();
-            TransientEntitySectionManagerAccessor tAcc = (TransientEntitySectionManagerAccessor) tManager;
-
-            long tSectionKey = SectionPos.asLong(self.blockPosition());
-            EntitySection<Entity> tSection = tAcc.getSectionStorage().getSection(tSectionKey);
-            if (tSection != null) {
-                hardRemove(self, ((ClassInstanceMultiMapAccessor<Entity>) ((EntitySectionAccessor<Entity>) tSection).getStorage()).getByClass());
-                tSection.remove(self);
-            }
-
-            EntityLookup<Entity> tVisible =
-                    ((LevelEntityGetterAdapterAccessor<Entity>) tManager.getEntityGetter()).getVisibleEntities();
-            ((EraseEntityLookupBridge<Entity>) tVisible).eraseEntity(self);
-
-            clientLevel.removeEntity(self.getId(), Entity.RemovalReason.KILLED);
-        }
     }
 
     private static void hardRemove(Entity self, Map<Class<?>, List<Entity>> byClass) {

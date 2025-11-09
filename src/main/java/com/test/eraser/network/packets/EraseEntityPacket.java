@@ -1,16 +1,20 @@
 package com.test.eraser.network.packets;
 
 import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.network.ClientPacketHandler;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
 public class EraseEntityPacket {
-    private final int entityId;
+    public final int entityId;
 
     public EraseEntityPacket(int entityId) {
         this.entityId = entityId;
@@ -24,18 +28,13 @@ public class EraseEntityPacket {
         return new EraseEntityPacket(buf.readVarInt());
     }
 
-    public static void handle(EraseEntityPacket msg, Supplier<NetworkEvent.Context> ctxSup) {
-        NetworkEvent.Context ctx = ctxSup.get();
-        ctx.enqueueWork(() -> {
-            Minecraft mc = Minecraft.getInstance();
-            Level level = mc.level;
-            if (level != null) {
-                Entity e = level.getEntity(msg.entityId);
-                if (e != null) {
-                    if(e instanceof ILivingEntity erased) {erased.setErased(true);}
-                }
-            }
+    public static void handle(EraseEntityPacket msg, Supplier<NetworkEvent.Context> ctx) {
+        ctx.get().enqueueWork(() -> {
+            DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> {
+                ClientPacketHandler.handleEraseEntity(msg);
+            });
         });
-        ctx.setPacketHandled(true);
+        ctx.get().setPacketHandled(true);
     }
+
 }

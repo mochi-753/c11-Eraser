@@ -8,6 +8,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.entity.*;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.entity.PartEntity;
 
 import java.lang.reflect.Method;
 import java.util.List;
@@ -22,19 +23,14 @@ public class Eraser_Utils {
 
         for (Entity e : nearby) {
             if (e == self) continue;
-            try {
-                Method getParts = e.getClass().getMethod("getParts");
-                Object parts = getParts.invoke(e);
-                if (parts instanceof Object[] arr) {
-                    for (Object part : arr) {
-                        if (part == self) {
-                            return Optional.of(e);
-                        }
+
+            PartEntity<?>[] parts = e.getParts();
+            if (parts != null) {
+                for (PartEntity<?> part : parts) {
+                    if (part == self) {
+                        return Optional.of(e);
                     }
                 }
-            } catch (NoSuchMethodException ignore) {
-            } catch (Exception ex) {
-                ex.printStackTrace();
             }
         }
 

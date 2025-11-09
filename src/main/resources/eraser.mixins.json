@@ -29,7 +29,6 @@
     "eraser.EntityLookupAccessor",
     "eraser.LevelEntityGetterAdapterAccessor",
     "eraser.EntityLookupMixin",
-    "eraser.ClientLevelAccessor",
     "eraser.PersistentEntitySectionManagerCallbackMixin",
     "eraser.PersistentEntitySectionManagerMixin",
     "eraser.ServerGamePacketListenerImplMixin",
@@ -37,6 +36,7 @@
     "eraser.TrackedEntityAccessor",
     "eraser.ServerLevelEntityCallbacksMixin",
     "eraser.EntityAccessor",
+    "eraser.ChunkSerializerMixin",
     "snackprotector.LivingEntityMixin"
   ],
   "injectors": { "defaultRequire": 1 }
