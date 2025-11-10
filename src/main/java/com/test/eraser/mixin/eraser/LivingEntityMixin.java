@@ -17,10 +17,12 @@ import net.minecraft.network.protocol.game.ClientboundPlayerCombatKillPacket;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.server.level.ChunkMap;
+import net.minecraft.server.level.ServerBossEvent;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.ClassInstanceMultiMap;
+import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -88,6 +90,8 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         LivingEntity self = (LivingEntity) (Object) this;
 
         if (this.isErased()) return;
+        markErased(self.getUUID());
+
         DamageSource eraseSrc = ModDamageSources.erase(self, attacker);
         EntityDataAccessor<Float> healthId = LivingEntityAccessor.getDataHealthId();
         //self.hurt(eraseSrc,Float.MAX_VALUE);
@@ -140,14 +144,13 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     @Override
     public void forceErase() {
         LivingEntity self = (LivingEntity) (Object) this;
-        markErased(self.getUUID());
         self.setPosRaw(Double.NaN, Double.NaN, Double.NaN);
-        ((EntityAccessor) self).setRemovalReason(Entity.RemovalReason.KILLED);
-        self.setRemoved(Entity.RemovalReason.KILLED);
+        //((EntityAccessor) self).setRemovalReason(Entity.RemovalReason.KILLED);
+        //self.setRemoved(Entity.RemovalReason.KILLED);
         if (self.level() instanceof ServerLevel serverLevel) {
             self.stopRiding();
             self.invalidateCaps();
-            self.setLevelCallback(EntityInLevelCallback.NULL);
+            ((EntityAccessor)self).setlevelCallback(EntityInLevelCallback.NULL);
             EntityTickList tickList = ((ServerLevelAccessor) serverLevel).getEntityTickList();
             tickList.remove(self);
             Int2ObjectMap<Entity> active = ((EntityTickListAccessor) tickList).getActive();
@@ -156,11 +159,10 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             ClientboundRemoveEntitiesPacket removePkt = new ClientboundRemoveEntitiesPacket(new int[]{self.getId()});
             ClientboundBossEventPacket bossRemovePkt = ClientboundBossEventPacket.createRemovePacket(self.getUUID());
             for (ServerPlayer sp : serverLevel.players()) {
-                sp.connection.send(removePkt);
+                //sp.connection.send(removePkt);
                 sp.connection.send(bossRemovePkt);
-                PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), new EraseEntityPacket(self.getId()));
+                PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), new EraseEntityPacket(self.getUUID()));
             }
-
             PersistentEntitySectionManager<Entity> manager =
                     ((ServerLevelAccessor) serverLevel).getEntityManager();
             PersistentEntitySectionManagerAccessor<Entity> acc =
@@ -199,8 +201,9 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             if (self instanceof TrackedEntityAccessor accessor) {
                 accessor.invokeBroadcastRemoved();
             }
-            if (serverLevel.getEntity(self.getUUID()) != null && vis.getEntity(self.getUUID()) != null && vis2.getEntity(self.getUUID()) != null && acc.getKnownUuids().contains(self.getUUID()) && ((EntitySectionAccessor<?>) section2).getStorage().contains(self)) {
-                System.err.println("[EraserMod] failed to fully remove entity id=" + self.getId());
+            self.setUUID(new UUID(0L, 0L));
+            if (serverLevel.getEntity(self.getUUID()) != null || vis.getEntity(self.getUUID()) != null || vis2.getEntity(self.getUUID()) != null || acc.getKnownUuids().contains(self.getUUID()) || ((EntitySectionAccessor<?>) section2).getStorage().contains(self)) {
+                System.out.println("[EraserMod] failed to fully remove entity id=" + self.getId());
             } else {
                 System.out.println("[EraserMod] successfully removed entity id=" + self.getId());
             }

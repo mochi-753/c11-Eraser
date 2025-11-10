@@ -11,6 +11,7 @@
     "client.ItemStackDisplayMixin",
     "client.SetScreenMixin",
     "client.ClientLevelAccessor",
+    "client.LivingEntityMixin",
     "snackprotector.GameRendererMixin"
   ],
   "mixins": [

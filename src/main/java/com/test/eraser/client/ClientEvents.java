@@ -15,6 +15,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
@@ -27,7 +28,10 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientEvents {
@@ -103,7 +107,7 @@ public class ClientEvents {
 
     }
 
-    @SubscribeEvent
+    /*@SubscribeEvent //shitty shield effect rendering
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
             PoseStack poseStack = event.getPoseStack();
@@ -113,16 +117,27 @@ public class ClientEvents {
 
             buffer.endBatch();
         }
+    }*/
+
+    private static final Map<UUID, Long> lastUpdate = new HashMap<>();
+
+    @SubscribeEvent
+    public static void onRenderLiving(RenderLivingEvent.Pre<LivingEntity, ?> event) {
+        LivingEntity entity = event.getEntity();
+        UUID uuid = entity.getUUID();
+
+        if (entity instanceof ILivingEntity living && living.isErased(uuid)) {
+            long now = System.currentTimeMillis();
+            long last = lastUpdate.getOrDefault(uuid, 0L);
+
+            if (now - last >= 50 && !entity.isDeadOrDying()) {//1tick
+                entity.deathTime++;
+                entity.setPose(Pose.DYING);
+                lastUpdate.put(uuid, now);
+            }
+            if(entity.deathTime > 20)event.setCanceled(true);
+        }
     }
 
-    /*@SubscribeEvent
-    public static void onRenderLivingPre(RenderLivingEvent.Pre<LivingEntity, ?> event) {
-        LivingEntity entity = event.getEntity();
-        PoseStack stack = event.getPoseStack();
-
-        if (entity.deathTime > 0) {
-            stack.mulPose(Axis.ZP.rotationDegrees(90.0F));
-        }
-    }*/
 }
 

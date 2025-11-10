@@ -49,4 +49,5 @@ public interface LivingEntityAccessor {
 
     @Invoker("die")
     void callDie(DamageSource source);
+
 }

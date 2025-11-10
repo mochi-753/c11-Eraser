@@ -9,32 +9,35 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.NetworkEvent;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class EraseEntityPacket {
-    public final int entityId;
+    public final UUID entityUuid;
 
-    public EraseEntityPacket(int entityId) {
-        this.entityId = entityId;
+    public EraseEntityPacket(UUID entityUuid) {
+        this.entityUuid = entityUuid;
     }
 
     public static void encode(EraseEntityPacket msg, FriendlyByteBuf buf) {
-        buf.writeVarInt(msg.entityId);
+        buf.writeUUID(msg.entityUuid);
     }
 
     public static EraseEntityPacket decode(FriendlyByteBuf buf) {
-        return new EraseEntityPacket(buf.readVarInt());
+        return new EraseEntityPacket(buf.readUUID());
     }
 
     public static void handle(EraseEntityPacket msg, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> {
-            DistExecutor.safeRunWhenOn(Dist.CLIENT, () -> () -> {
+        NetworkEvent.Context context = ctx.get();
+        context.enqueueWork(() -> {
+            if (FMLEnvironment.dist.isClient()) {
+                System.out.println("Received EraseEntityPacket for UUID: " + msg.entityUuid);
                 ClientPacketHandler.handleEraseEntity(msg);
-            });
+            }
         });
-        ctx.get().setPacketHandled(true);
+        context.setPacketHandled(true);
     }
-
 }
