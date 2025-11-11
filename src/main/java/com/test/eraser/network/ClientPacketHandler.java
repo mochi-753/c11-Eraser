@@ -13,6 +13,8 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import static com.mojang.text2speech.Narrator.LOGGER;
+
 @OnlyIn(Dist.CLIENT)
 public class ClientPacketHandler {
     public static void handleEraseEntity(EraseEntityPacket msg) {
@@ -31,12 +33,13 @@ public class ClientPacketHandler {
             }
 
             if (((LivingEntity)e) instanceof ILivingEntity erased) {
-                //System.out.println("[Eraser] Received EraseEntityPacket for entity UUID: " + e.getUUID());
-                erased.markErased(e.getUUID());
-                BossHealthOverlay overlay = mc.gui.getBossOverlay();
+                LOGGER.info("[Eraser] Received EraseEntityPacket for entity UUID: " + e.getUUID());
 
+                BossHealthOverlay overlay = mc.gui.getBossOverlay();
                 overlay.update(ClientboundBossEventPacket.createRemovePacket(e.getUUID()));
+
                 erased.eraseClientEntity();
+                erased.markErased(e.getUUID());
             }
         }
     }

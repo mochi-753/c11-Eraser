@@ -1,5 +1,6 @@
 package com.test.eraser.mixin.eraser;
 
+import com.test.eraser.Config;
 import com.test.eraser.additional.SnackArmor;
 import com.test.eraser.logic.ILivingEntity;
 import net.minecraft.server.level.ServerLevel;
@@ -44,7 +45,7 @@ public class EntityMixin {
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void onTick(CallbackInfo ci) {
         if ((Object)this instanceof ILivingEntity living && living.isErased()) {
-            ci.cancel();
+            if (!Config.isNormalDieEntity(((Entity)((Object)this))))ci.cancel();
         }
     }
 

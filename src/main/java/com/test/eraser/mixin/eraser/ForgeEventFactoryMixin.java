@@ -19,7 +19,6 @@ public class ForgeEventFactoryMixin {
     private static void eraser$cancelPreTick(Player player, CallbackInfo ci) {
         if (player instanceof ILivingEntity erased && erased.isErased()) {
             player.setHealth(0);
-            //AttackHandler.instantKill(player);
             //ci.cancel();
         }
     }

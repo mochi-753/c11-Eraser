@@ -12,7 +12,11 @@ import com.test.eraser.network.packets.RayCastPacket;
 import com.test.eraser.network.packets.WorldDestroyerChangeModePacket;
 import com.test.eraser.utils.DestroyMode;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
@@ -25,21 +29,22 @@ import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientEvents {
+
+    public static final List<Entity> erasedEntities = new ArrayList<>();
 
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         Minecraft mc = Minecraft.getInstance();
         if (mc == null || mc.player == null || mc.level == null) return;
+        erase();
         ItemStack stack = mc.player.getMainHandItem();
         if (stack.getItem() == ModItems.ERASER_ITEM.get()) {
             if (mc.player.isShiftKeyDown()) {
@@ -135,9 +140,46 @@ public class ClientEvents {
                 entity.setPose(Pose.DYING);
                 lastUpdate.put(uuid, now);
             }
-            if(entity.deathTime > 20)event.setCanceled(true);
+            if (entity.deathTime > 20) event.setCanceled(true);
         }
     }
 
+    @SubscribeEvent
+    public void onEntityJoinLevel(EntityJoinLevelEvent event) {
+        if (event.getEntity() instanceof ILivingEntity living) {
+            if (living.isErased()) {
+                Minecraft mc = Minecraft.getInstance();
+                if (mc == null || mc.player == null || mc.level == null) return;
+
+                System.out.println(Component.literal("[Eraser] Prevented joining erased entity to level: " + event.getEntity().toString()));
+                event.setCanceled(true);
+            }
+        }
+    }
+
+    public static boolean erase() {
+        Minecraft mc = Minecraft.getInstance();
+        ClientLevel level = mc.level;
+        int[] ids = erasedEntities.stream()
+                .mapToInt(Entity::getId)
+                .toArray();
+
+        Iterable<Entity> renderList = level.entitiesForRendering();
+
+        for (int id : ids) {
+            Entity e = level.getEntity(id);
+            if (e != null) {
+                ClientPacketListener connection = mc.getConnection();
+
+                ClientboundRemoveEntitiesPacket packet =
+                        new ClientboundRemoveEntitiesPacket(e.getId());
+
+                packet.handle(connection);
+                return true;
+            }
+
+        }
+        return false;
+    }
 }
 

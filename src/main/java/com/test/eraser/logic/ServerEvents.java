@@ -7,11 +7,13 @@ import com.test.eraser.additional.SnackArmor;
 import com.test.eraser.entity.HomingArrowEntity;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
+import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
@@ -216,6 +218,14 @@ public class ServerEvents {
 
             if (hasEraser || hasWorldDestroyer) {
                 event.setLootingLevel(7);
+            }
+        }
+    }
+    @SubscribeEvent
+    public void onEntityJoinLevel(EntityJoinLevelEvent event) {
+        if(event.getEntity() instanceof ILivingEntity living) {
+            if(living.isErased()) {
+                event.setCanceled(true);
             }
         }
     }

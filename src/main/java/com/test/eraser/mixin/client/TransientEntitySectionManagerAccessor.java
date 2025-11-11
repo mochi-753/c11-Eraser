@@ -1,12 +1,9 @@
-package com.test.eraser.mixin.eraser;
+package com.test.eraser.mixin.client;
 
 import net.minecraft.world.level.entity.*;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
-
-import java.util.Set;
-import java.util.UUID;
 
 @Mixin(TransientEntitySectionManager.class)
 public interface TransientEntitySectionManagerAccessor<T extends EntityAccess> {

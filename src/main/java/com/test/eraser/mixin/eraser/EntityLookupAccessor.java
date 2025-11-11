@@ -3,7 +3,10 @@ package com.test.eraser.mixin.eraser;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.world.level.entity.EntityAccess;
 import net.minecraft.world.level.entity.EntityLookup;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Mutable;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.Map;
@@ -16,4 +19,11 @@ public interface EntityLookupAccessor<T extends EntityAccess> {
 
     @Accessor("byUuid")
     Map<UUID, T> getByUuid();
+
+    @Shadow @Mutable @Final @Accessor("byUuid")
+    void setByUuid(Map<UUID, T> map);
+
+    @Shadow @Mutable @Final @Accessor("byId")
+    void setById(Int2ObjectMap<T> map);
+
 }
