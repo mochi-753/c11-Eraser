@@ -35,6 +35,9 @@ public class ModItems {
     public static final RegistryObject<Item> SNACK_BOOTS =
             ITEMS.register("snack_protect_boots", () -> new Snack_Boots());
 
+    public static final RegistryObject<Item> CANTEEN_ITEM =
+            ITEMS.register("ultimate_canteen", () -> new UltimaCanteen(new Item.Properties().stacksTo(1)));
+
     public static List<Item> getAllItems() {
         return ITEMS.getEntries().stream()
                 .map(RegistryObject::get)

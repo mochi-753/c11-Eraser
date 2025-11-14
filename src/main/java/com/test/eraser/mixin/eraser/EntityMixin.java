@@ -60,6 +60,13 @@ public class EntityMixin {
         }
     }
 
+    @Inject(method = "isRemoved", at = @At("HEAD"), cancellable = true)
+    private void onisRemoved(CallbackInfoReturnable<Boolean> cir) {
+        if (((Entity)(Object)this) instanceof ILivingEntity living && living.isErased()) {
+            cir.setReturnValue(true);
+        }
+    }
+
     /*@Inject(method = "getId", at = @At("HEAD"), cancellable = true)
     private void overridegetId(CallbackInfoReturnable<Integer> cir) {
         Entity ent = (Entity) (Object) this;

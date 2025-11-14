@@ -12,22 +12,29 @@ import com.test.eraser.network.packets.EraserRangeAttackPacket;
 import com.test.eraser.network.packets.RayCastPacket;
 import com.test.eraser.network.packets.WorldDestroyerChangeModePacket;
 import com.test.eraser.utils.DestroyMode;
+import com.test.eraser.utils.RenderUtils;
+import com.test.eraser.utils.Res;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.BossHealthOverlay;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.*;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
@@ -38,6 +45,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
 import java.util.*;
+import java.util.function.Predicate;
+
+import static com.test.eraser.logic.DestroyBlock.QueueRenderBreakBlock;
+import static com.test.eraser.utils.RenderUtils.renderBlockList;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientEvents {
@@ -49,6 +60,25 @@ public class ClientEvents {
         Minecraft mc = Minecraft.getInstance();
 
         if (mc == null || mc.player == null || mc.level == null) return;
+        HitResult hit = mc.hitResult;
+
+        if (hit != null && hit.getType() == HitResult.Type.BLOCK) {
+            BlockHitResult blockHit = (BlockHitResult) hit;
+            boolean same_id = DestroyMode.getMode(mc.player.getMainHandItem()) == DestroyMode.SAME_ID || DestroyMode.getMode(mc.player.getMainHandItem()) == DestroyMode.SAME_ID_ORE;
+            Predicate<BlockState> accept = state -> !state.isAir();
+            BlockState LookBlockState = mc.level.getBlockState(blockHit.getBlockPos());
+            if(DestroyMode.getMode(mc.player.getMainHandItem()) == DestroyMode.SAME_ID_ORE) {
+                TagKey<Block> FORGE_ORES = BlockTags.create(Res.getResource("forge", "ores"));
+                accept = state -> state.is(FORGE_ORES) || state.is(BlockTags.LOGS);
+            }
+            else if(DestroyMode.getMode(mc.player.getMainHandItem()) == DestroyMode.SAME_ID){
+                accept = state -> state.is(LookBlockState.getBlock());
+            }
+            if(DestroyMode.getMode(mc.player.getMainHandItem()) == DestroyMode.NORMAL || mc.player.getMainHandItem().getItem() != ModItems.WORLD_DESTROYER.get() ) {
+                RenderQueue.clear();
+            }
+            else QueueRenderBreakBlock(mc.level, mc.player, blockHit.getBlockPos(),DestroyMode.getMode(mc.player.getMainHandItem()),same_id,32,accept);
+        }else RenderQueue.clear();
         erase();
         ItemStack stack = mc.player.getMainHandItem();
         if (stack.getItem() == ModItems.ERASER_ITEM.get()) {
@@ -168,8 +198,6 @@ public class ClientEvents {
                 .mapToInt(Entity::getId)
                 .toArray();
 
-        Iterable<Entity> renderList = level.entitiesForRendering();
-
         for (int id : ids) {
             Entity e = level.getEntity(id);
             if (e != null) {
@@ -185,5 +213,24 @@ public class ClientEvents {
         }
         return false;
     }
+
+    @SubscribeEvent
+    @OnlyIn(Dist.CLIENT)
+    public static void onRenderLevelStage(RenderLevelStageEvent event) {
+        if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_TRANSLUCENT_BLOCKS) {
+            Minecraft mc = Minecraft.getInstance();
+            PoseStack poseStack = event.getPoseStack();
+            Vec3 camera = event.getCamera().getPosition();
+
+            /*for (RenderQueue.RenderEntry entry : RenderQueue.getEntries()) {
+                if(entry == null) break;
+                RenderUtils.renderBlockBox(poseStack, camera, entry.pos, entry.color);
+            }*/
+            renderBlockList(event.getPoseStack(), event.getCamera().getPosition(), RenderQueue.getPositions(), 0xFFFFFFFF);
+
+            //RenderQueue.clear();
+        }
+    }
+
 }
 

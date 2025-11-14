@@ -17,13 +17,14 @@ public interface LivingEntityAccessor {
         throw new AssertionError();
     }
 
-
-
     @Accessor("lastHurtByPlayer")
     Player getLastHurtByPlayer();
 
     @Accessor("lastHurtByPlayer")
     void setLastHurtByPlayer(Player player);
+
+    @Accessor("lastHurtByMob")
+    void setLastHurtByMob(LivingEntity entity);
 
     @Accessor("lastHurtByPlayerTime")
     int getLastHurtByPlayerTime();

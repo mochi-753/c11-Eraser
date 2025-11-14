@@ -20,7 +20,7 @@ public class ModCommands {
                         .executes(context -> {
                             CommandSourceStack source = context.getSource();
                             if (source.getPlayer() instanceof ILivingEntity player) {
-                                player.instantKill();
+                                player.instantKill(source.getPlayer());
                             }
 
                             return Command.SINGLE_SUCCESS;

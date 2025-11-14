@@ -1,5 +1,6 @@
 package com.test.eraser.logic;
 
+import com.test.eraser.client.RenderQueue;
 import com.test.eraser.mixin.world_destroyer.ServerLevelAccessor;
 import com.test.eraser.mixin.world_destroyer.ServerLevelMixin;
 import com.test.eraser.utils.DestroyMode;
@@ -11,20 +12,19 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 
 public class DestroyBlock {
@@ -190,4 +190,77 @@ public class DestroyBlock {
                 state -> state.getBlock() == level.getBlockState(center).getBlock());
     }
 
+    public static List<BlockPos> getBreakPositions(Level level, Player player, BlockPos center, DestroyMode mode, boolean sameId, int maxCount, Predicate<BlockState> accept) {
+        List<BlockPos> result = new ArrayList<>();
+
+        if (sameId) {
+            //Same ID Mode
+            BlockState originState = level.getBlockState(center);
+            if (originState.isAir()) return result;
+
+            Deque<BlockPos> queue = new ArrayDeque<>();
+            Set<Long> visited = new HashSet<>();
+
+            queue.add(center);
+            visited.add(center.asLong());
+
+            int destroyed = 0;
+
+            while (!queue.isEmpty() && destroyed < maxCount) {
+                BlockPos pos = queue.pollFirst();
+                BlockState state = level.getBlockState(pos);
+
+                if (state.isAir()) continue;
+                if (!accept.test(state)) continue;
+
+                result.add(pos);
+                destroyed++;
+                if (destroyed >= maxCount) break;
+
+                for (Direction dir : Direction.values()) {
+                    BlockPos next = pos.relative(dir);
+                    long key = next.asLong();
+                    if (visited.contains(key)) continue;
+                    visited.add(key);
+                    queue.addLast(next);
+                }
+            }
+        } else {
+            //Area break mode
+            int halfX = mode.x / 2;
+            int halfY = mode.y / 2;
+            int halfZ = mode.z / 2;
+
+            BlockPos base = center.above(mode.yOffset);
+            Direction facing = player.getDirection();
+
+            for (int dx = -halfX; dx <= halfX; dx++) {
+                for (int dy = -halfY; dy <= halfY; dy++) {
+                    for (int dz = -halfZ; dz <= halfZ; dz++) {
+                        BlockPos target;
+                        switch (facing) {
+                            case NORTH -> target = base.offset(dx, dy, -dz);
+                            case WEST  -> target = base.offset(-dz, dy, dx);
+                            case EAST  -> target = base.offset(dz, dy, dx);
+                            default    -> target = base.offset(dx, dy, dz);
+                        }
+                        result.add(target);
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public static void QueueRenderBreakBlock(Level level, Player player, BlockPos center, DestroyMode mode, boolean sameId, int maxCount, Predicate<BlockState> accept) {
+        List<BlockPos> targets = getBreakPositions(level, player, center, mode, sameId, maxCount, accept);
+        RenderQueue.clear();
+        for (BlockPos pos : targets) {
+            BlockState state = level.getBlockState(pos);
+            if (state.isAir()) continue;
+
+            RenderQueue.add(new RenderQueue.RenderEntry(pos, 0xFFFFFFFF));
+        }
+    }
 }

@@ -53,12 +53,12 @@ public class WorldDestroyerUtils {
                 Predicate<BlockState> oreOrLogPredicate = state ->
                         state.is(FORGE_ORES) || state.is(BlockTags.LOGS);
 
-                Predicate<BlockState> orePredicate = state -> state.is(FORGE_ORES);
+                //Predicate<BlockState> orePredicate = state -> state.is(FORGE_ORES);
                 if (silk) {
-                    DestroyBlock.breakSameId(level, player, pos, held, 0, true, 32, orePredicate);
+                    DestroyBlock.breakSameId(level, player, pos, held, 0, true, 32, oreOrLogPredicate);
                     DestroyBlock.breakBlockSilk(level, player, pos, held);
                 } else {
-                    DestroyBlock.breakSameId(level, player, pos, held, fortuneLevel, false, 32, orePredicate);
+                    DestroyBlock.breakSameId(level, player, pos, held, fortuneLevel, false, 32, oreOrLogPredicate);
                     DestroyBlock.breakAreaWithFortune(level, player, pos, mode, held, fortuneLevel);
                 }
             }

@@ -105,7 +105,7 @@ public class World_Destroyer_Item extends PickaxeItem {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity target) {
-        //if(!player.level().isClientSide())killIfParentFound(target, player, 32);
+        if(!player.level().isClientSide())killIfParentFound(target, player, 32);
         target.kill();
         return false;
     }

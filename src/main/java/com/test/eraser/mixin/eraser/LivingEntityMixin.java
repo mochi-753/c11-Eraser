@@ -98,6 +98,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         //self.hurt(eraseSrc,Float.MAX_VALUE);
         SynchedEntityDataUtil.forceSet(self.getEntityData(), healthId, 0.0F);
         ((LivingEntityAccessor) self).setLastHurtByPlayer(attacker);
+        ((LivingEntityAccessor) self).setLastHurtByMob(attacker);
         ((LivingEntityAccessor) self).setLastHurtByPlayerTime(1);
         self.getCombatTracker().recordDamage(eraseSrc, Float.MAX_VALUE);
         if(self.level().isClientSide()) return;
@@ -118,8 +119,8 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         LivingEntity self = (LivingEntity) (Object) this;
         //if(!(self instanceof ServerPlayer)) { self.die(source);}
         ((LivingEntityAccessor) self).setDeadFlag(true);
-        //self.deathTime = 1;
-
+        self.deathTime = 1;
+        ((EntityAccessor)self).setRemovalReason(Entity.RemovalReason.KILLED);
         if (!self.level().isClientSide) {
 
             if (self instanceof ServerPlayer sp) {
@@ -146,20 +147,17 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     @Override
     public void forceErase() {
         LivingEntity self = (LivingEntity) (Object) this;
-        //self.setPosRaw(Double.NaN, Double.NaN, Double.NaN);
-        //((EntityAccessor) self).setRemovalReason(Entity.RemovalReason.KILLED);
-        //self.setRemoved(Entity.RemovalReason.KILLED);
+        ((EntityAccessor) self).setRemovalReason(Entity.RemovalReason.KILLED);
         if (self.level() instanceof ServerLevel serverLevel) {
             boolean debug = false;
             self.stopRiding();
             self.invalidateCaps();
             ((EntityAccessor) self).setlevelCallback(EntityInLevelCallback.NULL);
             EntityTickList tickList = ((ServerLevelAccessor) serverLevel).getEntityTickList();
-            tickList.remove(self);
             Int2ObjectMap<Entity> active = ((EntityTickListAccessor) tickList).getActive();
             active.remove(self.getId());
 
-            ClientboundRemoveEntitiesPacket removePkt = new ClientboundRemoveEntitiesPacket(new int[]{self.getId()});
+            ClientboundRemoveEntitiesPacket removePkt = new ClientboundRemoveEntitiesPacket(self.getId());
             ClientboundBossEventPacket bossRemovePkt = ClientboundBossEventPacket.createRemovePacket(self.getUUID());
             for (ServerPlayer sp : serverLevel.players()) {
                 //sp.connection.send(removePkt);
@@ -205,7 +203,6 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             if (self instanceof TrackedEntityAccessor accessor) {
                 accessor.invokeBroadcastRemoved();
             }
-            ((EntityAccessor)self).setRemovalReason(Entity.RemovalReason.KILLED);
             if(debug) {
                 UUID originalUuid = self.getUUID();
                 int id = self.getId();
