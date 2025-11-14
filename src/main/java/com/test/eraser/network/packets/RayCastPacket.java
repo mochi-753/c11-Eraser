@@ -45,7 +45,7 @@ public class RayCastPacket {
                     ((BossHelthOverlayAccessor)mc.gui.getBossOverlay()).getEvents().remove(target.getUUID());
                     Eraser_Utils.killIfParentFound(target, (Player)sender, 32);
 
-                    System.out.println("RayCastPacket: processed entity ID " + msg.entityId);
+                    //System.out.println("RayCastPacket: processed entity ID " + msg.entityId);
                 }
             }
         });

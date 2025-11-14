@@ -37,12 +37,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.mojang.text2speech.Narrator.LOGGER;
 
 @Mixin(value = LivingEntity.class)
 public abstract class LivingEntityMixin implements ILivingEntity {
@@ -89,7 +92,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     public void instantKill(Player attacker) {
         LivingEntity self = (LivingEntity) (Object) this;
         self.setPose(Pose.DYING);
-        SynchedEntityDataUtil.forceSet(self.getEntityData(), EntityAccessor.getDataPoseId(), 0.0F);
+        //SynchedEntityDataUtil.forceSet(self.getEntityData(), EntityAccessor.getDataPoseId(), 0.0F);
         if (this.isErased() || self.level().isClientSide) return;
         markErased(self.getUUID());
 
@@ -144,12 +147,44 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         instantKill((Player) null);
     }
 
+    @Unique
+    void removeBossBar(ServerLevel serverLevel) {
+        LivingEntity self = (LivingEntity) (Object) this;
+
+        Class<?> clazz = self.getClass();
+        for (int depth = 0; depth < 3 && clazz != null; depth++) {
+            for (Field f : clazz.getDeclaredFields()) {
+                if (ServerBossEvent.class.isAssignableFrom(f.getType())) {
+                    f.setAccessible(true);
+                    try {
+                        ServerBossEvent event = (ServerBossEvent) f.get(self);
+                        if (event == null) continue;
+
+                        ClientboundBossEventPacket bossRemovePkt =
+                                ClientboundBossEventPacket.createRemovePacket(event.getId());
+
+                        for (ServerPlayer sp : serverLevel.players()) {
+                            sp.connection.send(bossRemovePkt);
+                        }
+                        event.removeAllPlayers();
+
+                    } catch (ReflectiveOperationException | ClassCastException ex) {
+                        LOGGER.error("Failed to remove boss bar from {} (id={}, uuid={})",
+                                self.getName().getString(), self.getId(), self.getUUID(), ex);
+                    }
+                }
+            }
+            clazz = clazz.getSuperclass();
+        }
+    }
+
     @Override
-    public void forceErase() {
+    public void forceErase(){
         LivingEntity self = (LivingEntity) (Object) this;
         self.level().broadcastEntityEvent(self, (byte)60);
         ((EntityAccessor) self).setRemovalReason(Entity.RemovalReason.KILLED);
         if (self.level() instanceof ServerLevel serverLevel) {
+            removeBossBar(serverLevel);
             boolean debug = false;
             self.stopRiding();
             self.invalidateCaps();

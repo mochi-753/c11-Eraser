@@ -32,6 +32,10 @@ public class Config {
                             obj -> obj instanceof String s && ResourceLocation.tryParse(s) != null
                     );
 
+    public static final ForgeConfigSpec.BooleanValue CHENGEMODE_MESSAGE = BUILDER
+            .comment("If enabled ClientMessage will be displayed when changing World Destroyer's mode.")
+            .define("client_message", false);
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     private static Set<ResourceLocation> normalDieEntities = Set.of();

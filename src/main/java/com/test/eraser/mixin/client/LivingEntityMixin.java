@@ -72,11 +72,12 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         //removeFromOtherIndexes(self.getUUID(), clientLevel, tManager);
         clientLevel.removeEntity(self.getId(), Entity.RemovalReason.KILLED);
         self.remove(Entity.RemovalReason.KILLED);
+        self.invalidateCaps();
         Entity e = clientLevel.getEntity(self.getId());
         List<Entity> snapshot = StreamSupport.stream(((LevelEntityGetterAdapterAccessor<Entity>) tManager.getEntityGetter()).getVisibleEntities().getAllEntities().spliterator(), false)
                 .collect(Collectors.toList());
 
-        Entity found = null;
+        /*Entity found = null;
         for (Entity ent : snapshot) {
 
             if (ent == null) continue;
@@ -104,10 +105,10 @@ public abstract class LivingEntityMixin implements ILivingEntity {
                 break;
             }
         }
-        self.remove(Entity.RemovalReason.KILLED);
-        self.invalidateCaps();
+
         scanClientEntity(self.getId(), clientLevel);
-        if (e != null || found != null) {
+        */
+        if (e != null) {
             LOGGER.info("[EraserMod] failed to fully remove client entity id=" + self.getId());
             ClientboundRemoveEntitiesPacket packet =
                     new ClientboundRemoveEntitiesPacket(self.getId());

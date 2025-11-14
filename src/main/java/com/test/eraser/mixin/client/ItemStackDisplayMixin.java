@@ -1,6 +1,7 @@
 package com.test.eraser.mixin.client;
 
 import com.test.eraser.additional.ModItems;
+import com.test.eraser.utils.DestroyMode;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -35,7 +36,7 @@ public abstract class ItemStackDisplayMixin {
 
     private static Component buildInfinityLine(Component attributeName) {
         long time = System.currentTimeMillis() / 50;
-        String text = " Infinity";
+        String text = " Infinity " + attributeName.getString();
         MutableComponent waveLine = Component.empty();
         for (int j = 0; j < text.length(); j++) {
             int color = waveGrayWhiteColor(time, j, 6.0);
@@ -44,7 +45,7 @@ public abstract class ItemStackDisplayMixin {
                             .withStyle(s -> s.withColor(color))
             );
         }
-        return Component.literal("").append(waveLine).append(" ").append(attributeName);
+        return Component.literal("").append(waveLine);
     }
 
     private static int waveYellowGoldColor(long time, int index, double speed) {
@@ -139,7 +140,14 @@ public abstract class ItemStackDisplayMixin {
         if (applycolorname(stack)) {
             String text = cir.getReturnValue().getString(); //after rename
             long time = System.currentTimeMillis() / 50;
-
+            if(stack.getItem() == ModItems.WORLD_DESTROYER.get()) {
+                text += " Mode:[";
+                text += DestroyMode.getMode(stack);
+                text += "]";
+                if(DestroyMode.isSilkTouchEnabled(stack)) {
+                    text += " [SilkTouch Enabled]";
+                }
+            }
             MutableComponent waveLine = Component.empty();
             for (int i = 0; i < text.length(); i++) {
                 int color = waveGrayWhiteColor(time, i, 6.0);

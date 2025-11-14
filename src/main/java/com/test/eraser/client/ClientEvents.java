@@ -185,7 +185,7 @@ public class ClientEvents {
                 Minecraft mc = Minecraft.getInstance();
                 if (mc == null || mc.player == null || mc.level == null) return;
 
-                System.out.println(Component.literal("[Eraser] Prevented joining erased entity to level: " + event.getEntity().toString()));
+                //System.out.println(Component.literal("[Eraser] Prevented joining erased entity to level: " + event.getEntity().toString()));
                 event.setCanceled(true);
             }
         }

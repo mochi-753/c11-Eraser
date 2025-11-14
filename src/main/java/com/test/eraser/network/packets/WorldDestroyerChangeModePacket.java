@@ -1,5 +1,6 @@
 package com.test.eraser.network.packets;
 
+import com.test.eraser.Config;
 import com.test.eraser.utils.DestroyMode;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -39,7 +40,8 @@ public class WorldDestroyerChangeModePacket {
                 DestroyMode.setMode(held, msg.mode);
                 DestroyMode.setSilkTouch(held, msg.silkEnabled);
 
-                player.displayClientMessage(
+                if(Config.CHENGEMODE_MESSAGE.get())
+                    player.displayClientMessage(
                         Component.literal(
                                 "Mode: " + msg.mode.name() +
                                         (msg.silkEnabled ? " [Silk ON]" : " [Silk OFF]")

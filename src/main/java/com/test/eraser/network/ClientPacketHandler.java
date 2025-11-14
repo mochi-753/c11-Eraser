@@ -33,7 +33,7 @@ public class ClientPacketHandler {
             }
 
             if (((LivingEntity)e) instanceof ILivingEntity erased) {
-                LOGGER.info("[Eraser] Received EraseEntityPacket for entity UUID: " + e.getUUID());
+                //LOGGER.info("[Eraser] Received EraseEntityPacket for entity UUID: " + e.getUUID());
                 erased.setErased(true);
                 BossHealthOverlay overlay = mc.gui.getBossOverlay();
                 overlay.update(ClientboundBossEventPacket.createRemovePacket(e.getUUID()));

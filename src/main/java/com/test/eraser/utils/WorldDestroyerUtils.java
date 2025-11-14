@@ -69,7 +69,7 @@ public class WorldDestroyerUtils {
             TagKey<Block> FORGE_ORES = BlockTags.create(Res.getResource("forge", "ores"));
             Predicate<BlockState> LogPredicate = state ->
                     state.is(BlockTags.LOGS);
-            DestroyBlock.breakSameId(level, player, pos, held, fortuneLevel, false, 16, LogPredicate);
+            DestroyBlock.breakSameId(level, player, pos, held, fortuneLevel, false, 8, LogPredicate);
             DestroyBlock.breakAreaWithFortune(level, player, pos, DestroyMode.NORMAL, held, fortuneLevel);
         }
         event.setCanceled(true);
