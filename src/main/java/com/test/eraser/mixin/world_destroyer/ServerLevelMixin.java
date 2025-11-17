@@ -35,7 +35,7 @@ public abstract class ServerLevelMixin implements IServerLevel {
         if (oldState == null) {
             return false;
         }
-        self.levelEvent(null, 2001, pos, Block.getId(oldState));
+        self.levelEvent(null, 2001, pos, Block.getId(oldState));//sound
         self.sendBlockUpdated(pos, oldState, newState, flags);
 
         for (Direction direction : Direction.values()) {//block update
