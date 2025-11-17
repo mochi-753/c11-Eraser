@@ -14,7 +14,6 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerCombatKillPacket;
-import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerBossEvent;
@@ -22,7 +21,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.stats.Stats;
 import net.minecraft.util.ClassInstanceMultiMap;
-import net.minecraft.world.BossEvent;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -38,13 +36,11 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.lang.reflect.Field;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
-
 import static com.mojang.text2speech.Narrator.LOGGER;
 
 @Mixin(value = LivingEntity.class)
@@ -84,6 +80,11 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     }
 
     @Override
+    public void unmarkErased(UUID uuid) {
+        erasedUuids.remove(uuid);
+    }
+
+    @Override
     public boolean isErased(UUID uuid) {
         return erasedUuids.contains(uuid);
     }
@@ -95,7 +96,9 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         //SynchedEntityDataUtil.forceSet(self.getEntityData(), EntityAccessor.getDataPoseId(), 0.0F);
         if (this.isErased() || self.level().isClientSide) return;
         markErased(self.getUUID());
-
+        for (ServerPlayer sp : ((ServerLevel)self.level()).players()) {
+            PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), new EraseEntityPacket(self.getUUID()));
+        }
         DamageSource eraseSrc = ModDamageSources.erase(self, attacker);
         EntityDataAccessor<Float> healthId = LivingEntityAccessor.getDataHealthId();
         //self.hurt(eraseSrc,Float.MAX_VALUE);
@@ -106,12 +109,12 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         self.getCombatTracker().recordDamage(eraseSrc, Float.MAX_VALUE);
         if(self.level().isClientSide()) return;
         this.setErased(true);
-        /*if (Config.isNormalDieEntity(self)) {((LivingEntityAccessor) self).callDie(eraseSrc);}
-        else if (Config.FORCE_DIE.get()) {*/
+        if (Config.isNormalDieEntity(self)) {/*((LivingEntityAccessor) self).callDie(eraseSrc);*/}
+        else if (Config.FORCE_DIE.get()) {
             forcedie(eraseSrc);
             if (!(self instanceof ServerPlayer))
                 TaskScheduler.schedule(this::forceErase, 21);
-        //}
+        }
         //ServerLevel dest = self.getServer().getLevel(Level.OVERWORLD);
         //if (dest == null) return;
         //Entity moved = self.changeDimension(dest);//for muteki star
@@ -150,7 +153,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     @Unique
     void removeBossBar(ServerLevel serverLevel) {
         LivingEntity self = (LivingEntity) (Object) this;
-
+        markErased(self.getUUID());
         Class<?> clazz = self.getClass();
         for (int depth = 0; depth < 3 && clazz != null; depth++) {
             for (Field f : clazz.getDeclaredFields()) {
@@ -193,13 +196,6 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             Int2ObjectMap<Entity> active = ((EntityTickListAccessor) tickList).getActive();
             active.remove(self.getId());
 
-            ClientboundRemoveEntitiesPacket removePkt = new ClientboundRemoveEntitiesPacket(self.getId());
-            ClientboundBossEventPacket bossRemovePkt = ClientboundBossEventPacket.createRemovePacket(self.getUUID());
-            for (ServerPlayer sp : serverLevel.players()) {
-                //sp.connection.send(removePkt);
-                sp.connection.send(bossRemovePkt);
-                PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), new EraseEntityPacket(self.getUUID()));
-            }
             PersistentEntitySectionManager<Entity> manager =
                     ((ServerLevelAccessor) serverLevel).getEntityManager();
             PersistentEntitySectionManagerAccessor<Entity> acc =
@@ -314,7 +310,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     @Inject(method = "getHealth", at = @At("RETURN"), cancellable = true)
     private void overrideGetHealth(CallbackInfoReturnable<Float> cir) {
         LivingEntity self = (LivingEntity) (Object) this;
-        if (this.isErased()) {
+        if (this.isErased(self.getUUID())) {
             cir.setReturnValue(0.0F);
         }
     }
@@ -335,7 +331,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             cir.setReturnValue(true);
             return;
         }
-        if (this.isErased()) {
+        if (this.isErased(self.getUUID())) {
             cir.setReturnValue(false);
         }
     }
@@ -347,7 +343,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             cir.setReturnValue(false);
             return;
         }
-        if (this.isErased()) {
+        if (this.isErased(self.getUUID())) {
             cir.setReturnValue(true);
         }
     }
@@ -369,13 +365,13 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         }
     }
 
-    @Inject(method = "tickDeath", at = @At("HEAD"), cancellable = true)
+    /*@Inject(method = "tickDeath", at = @At("HEAD"), cancellable = true)
     private void eraser$tickDeath(CallbackInfo ci) {
         LivingEntity self = (LivingEntity) (Object) this;
-        if (this.isErased()) {
+        if (this.isErased(self.getUUID())) {
             ci.cancel();
         }
-    }
+    }*/
 }
 
 

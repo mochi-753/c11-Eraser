@@ -34,7 +34,8 @@ public class EraseEntityPacket {
         NetworkEvent.Context context = ctx.get();
         context.enqueueWork(() -> {
             if (FMLEnvironment.dist.isClient()) {
-                System.out.println("Received EraseEntityPacket for UUID: " + msg.entityUuid);
+                //System.out.println("Received EraseEntityPacket for UUID: " + msg.entityUuid);
+
                 ClientPacketHandler.handleEraseEntity(msg);
             }
         });

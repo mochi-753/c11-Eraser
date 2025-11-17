@@ -169,7 +169,7 @@ public class SnackArmor {
             player.onUpdateAbilities();
             player.getFoodData().setFoodLevel(20);
             player.getFoodData().setSaturation(20.0F);
-            player.setHealth(player.getMaxHealth());
+            //player.setHealth(player.getMaxHealth());
             if (player instanceof ILivingEntity Iliving) Iliving.setwasFullset(true);
         }
 

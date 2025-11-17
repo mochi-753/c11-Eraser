@@ -9,6 +9,7 @@ import io.redspace.ironsspellbooks.api.spells.*;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -57,14 +58,11 @@ public class GazeDeathSpell extends AbstractSpell {
             }
             case 3 -> {
                 if (target instanceof ILivingEntity erased) {
-                    if (caster instanceof net.minecraft.world.entity.player.Player p) {
+                    if (caster instanceof Player p) {
                         erased.instantKill(p);
                     } else {
                         erased.instantKill();
                     }
-                } else {
-                    target.setHealth(0.0f);
-                    target.remove(Entity.RemovalReason.KILLED);
                 }
             }
             default -> {

@@ -5,25 +5,44 @@ import com.test.eraser.additional.ModDamageTypes;
 import com.test.eraser.additional.ModItems;
 import com.test.eraser.additional.SnackArmor;
 import com.test.eraser.entity.HomingArrowEntity;
+import com.test.eraser.network.PacketHandler;
+import com.test.eraser.network.packets.DestroyBlockPacket;
+import com.test.eraser.network.packets.RayCastPacket;
+import com.test.eraser.utils.DestroyMode;
+import com.test.eraser.utils.WorldDestroyerUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LootingLevelEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.level.ChunkDataEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+
+import static com.test.eraser.client.ClientEvents.isInGameWorld;
 
 @Mod.EventBusSubscriber(modid = Eraser.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ServerEvents {
@@ -186,6 +205,36 @@ public class ServerEvents {
         }
     }
 
+    @SubscribeEvent
+    public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
+        Player player = event.getEntity();
+        if(player instanceof ServerPlayer serverPlayer) {
+            if (player == null) return;
+            ItemStack stack = serverPlayer.getMainHandItem();
+            if (isInGameWorld() && (stack.getItem() == ModItems.ERASER_ITEM.get() || stack.getItem() == ModItems.WORLD_DESTROYER.get())) {
+
+                WorldDestroyerUtils.destroyblock(serverPlayer.getMainHandItem(), serverPlayer);
+            }
+        }
+    }
+
+    public static BlockHitResult getPlayerLookingAt(Player player, int reach) {
+        Level level = player.level();
+
+        Vec3 eyePosition = player.getEyePosition();
+        Vec3 lookVector = player.getLookAngle().scale(reach);
+        Vec3 endPosition = eyePosition.add(lookVector);
+
+        ClipContext context = new ClipContext(
+                eyePosition,
+                endPosition,
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.ANY,
+                player
+        );
+
+        return level.clip(context);
+    }
     /*@SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
     public static void onLivingAttack(LivingAttackEvent event) {
         Entity attacker = event.getSource().getEntity();
@@ -227,7 +276,7 @@ public class ServerEvents {
     public void onEntityJoinLevel(EntityJoinLevelEvent event) {
         if(event.getEntity() instanceof ILivingEntity living) {
             if(living.isErased()) {
-                event.setCanceled(true);
+                //event.setCanceled(true);
             }
         }
     }
@@ -240,6 +289,14 @@ public class ServerEvents {
             if (stack.getItem() == ModItems.ERASER_ITEM.get() || stack.getItem() == ModItems.WORLD_DESTROYER.get()) {
                 event.setCanceled(true);
             }
+        }
+    }
+
+    @SubscribeEvent
+    public void onRespawn(PlayerEvent.PlayerRespawnEvent event) {
+        if(event.getEntity() instanceof ILivingEntity living) {
+            living.setErased(false);
+            living.markErased(event.getEntity().getUUID());
         }
     }
 }

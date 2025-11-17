@@ -25,8 +25,12 @@ public interface ILivingEntity {
 
     void markErased(UUID uuid);
 
+    void unmarkErased(UUID uuid);
+
     boolean isErased(UUID uuid);
 
     // "client.ClientLevelAccessor",
     void eraseClientEntity();
+
+
 }

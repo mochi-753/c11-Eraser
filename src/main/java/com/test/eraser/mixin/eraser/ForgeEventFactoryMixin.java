@@ -10,28 +10,5 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(ForgeEventFactory.class)
 public class ForgeEventFactoryMixin {
-    @Inject(
-            method = "onPlayerPreTick",
-            at = @At("HEAD"),
-            cancellable = true,
-            remap = false
-    )
-    private static void eraser$cancelPreTick(Player player, CallbackInfo ci) {
-        if (player instanceof ILivingEntity erased && erased.isErased()) {
-            player.setHealth(0);
-            //ci.cancel();
-        }
-    }
 
-    @Inject(
-            method = "onPlayerPostTick",
-            at = @At("HEAD"),
-            cancellable = true,
-            remap = false
-    )
-    private static void eraser$cancelPostTick(Player player, CallbackInfo ci) {
-        if (player instanceof ILivingEntity erased && erased.isErased()) {
-            //ci.cancel();
-        }
-    }
 }

@@ -101,8 +101,8 @@ public abstract class ItemStackDisplayMixin {
                 tooltip.add(Component.translatable("item.erasers.use")
                         .withStyle(ChatFormatting.GRAY));
 
-                String normalText = " Shot Homing Arrow";
-                tooltip.add(makeWaveLine(normalText, true));
+                String normalText = " Shot Homing Arrow";//removed
+                //tooltip.add(makeWaveLine(normalText, true));
 
                 tooltip.add(Component.translatable("item.erasers.sneak_use")
                         .withStyle(ChatFormatting.DARK_GRAY));

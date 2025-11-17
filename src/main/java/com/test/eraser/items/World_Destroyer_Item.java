@@ -1,25 +1,41 @@
 package com.test.eraser.items;
 
+import com.test.eraser.additional.ModItems;
 import com.test.eraser.additional.ModTiers;
+import com.test.eraser.logic.DestroyBlock;
+import com.test.eraser.utils.DestroyMode;
+import com.test.eraser.utils.Res;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.Predicate;
 
 import static com.test.eraser.utils.Eraser_Utils.killIfParentFound;
 
 public class World_Destroyer_Item extends PickaxeItem {
     public World_Destroyer_Item(Properties props) {
-        super(ModTiers.WORLD_DESTROYER_TIER, 1, -2.8F, props.stacksTo(1).fireResistant());
+        super(ModTiers.WORLD_DESTROYER_TIER, 1, 3.F, props.stacksTo(1).fireResistant());
     }
 
     private static int waveGrayWhiteColor(long time, int index, double speed) {
@@ -105,9 +121,73 @@ public class World_Destroyer_Item extends PickaxeItem {
 
     @Override
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity target) {
-        if(!player.level().isClientSide())killIfParentFound(target, player, 32);
-        target.kill();
+        killIfParentFound(target, player, 32);
+        if(!(target instanceof LivingEntity))target.kill();
         return false;
+    }
+
+    /*public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
+        if (!(entity instanceof ServerPlayer player)) return false;
+        if (player.isSleeping()) {
+            return false;
+        }
+        ItemStack held = player.getMainHandItem();
+
+        ServerLevel level = (ServerLevel) entity.level();
+        BlockPos pos = getPlayerLookingAt(player).getBlockPos();
+        DestroyMode mode = DestroyMode.getMode(held);
+
+        int fortuneLevel = 7;
+        boolean silk = DestroyMode.isSilkTouchEnabled(held);
+        switch (mode) {
+            case SAME_ID -> {
+                var originBlockId = level.getBlockState(pos).getBlock()
+                        .builtInRegistryHolder().key().location();
+
+                if (silk) {
+                    DestroyBlock.breakSameIdByIdSilk(level, player, pos, held, originBlockId);
+                } else if (fortuneLevel > 0) {
+                    DestroyBlock.breakSameIdByIdFortune(level, player, pos, held, fortuneLevel, originBlockId);
+                } else {
+                    DestroyBlock.breakSameIdByIdNormal(level, player, pos, held, originBlockId);
+                }
+            }
+            case SAME_ID_ORE -> {
+                TagKey<Block> FORGE_ORES = BlockTags.create(Res.getResource("forge", "ores"));
+                Predicate<BlockState> oreOrLogPredicate = state ->
+                        state.is(FORGE_ORES) || state.is(BlockTags.LOGS);
+
+                if (silk) {
+                    DestroyBlock.breakSameId(level, player, pos, held, 0, true, 32, oreOrLogPredicate);
+                    DestroyBlock.breakBlockSilk(level, player, pos, held);
+                } else {
+                    DestroyBlock.breakSameId(level, player, pos, held, fortuneLevel, false, 32, oreOrLogPredicate);
+                    DestroyBlock.breakAreaWithFortune(level, player, pos, mode, held, fortuneLevel);
+                }
+            }
+            default -> DestroyBlock.breakAreaWithFortune(level, player, pos, mode, held, fortuneLevel);
+        }
+
+        return true;
+    }*/
+
+    public static BlockHitResult getPlayerLookingAt(Player player) {
+        Level level = player.level();
+        double reachDistance = 5.0;
+
+        Vec3 eyePosition = player.getEyePosition();
+        Vec3 lookVector = player.getLookAngle().scale(reachDistance);
+        Vec3 endPosition = eyePosition.add(lookVector);
+
+        ClipContext context = new ClipContext(
+                eyePosition,
+                endPosition,
+                ClipContext.Block.OUTLINE,
+                ClipContext.Fluid.ANY,
+                player
+        );
+
+        return level.clip(context);
     }
 
     @Override

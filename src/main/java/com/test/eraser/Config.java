@@ -28,7 +28,7 @@ public class Config {
             BUILDER.comment("Entities that should use normal die() instead of forced death")
                     .defineListAllowEmpty(
                             "normalDieEntities",
-                            List.of("minecraft:ender_dragon", "draconicevolution:draconic_guardian"),
+                            List.of("minecraft:ender_dragon", "draconicevolution:draconic_guardian", "witherstormmod:wither_storm"),
                             obj -> obj instanceof String s && ResourceLocation.tryParse(s) != null
                     );
 

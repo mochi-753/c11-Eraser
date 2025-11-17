@@ -16,7 +16,7 @@ import java.util.function.Predicate;
 
 @Mixin(Level.class)
 public abstract class LevelMixin {
-    @Inject(
+    /*@Inject(
             method = "getEntities(Lnet/minecraft/world/level/entity/EntityTypeTest;Lnet/minecraft/world/phys/AABB;Ljava/util/function/Predicate;Ljava/util/List;)V",
             at = @At("TAIL")
     )
@@ -28,5 +28,5 @@ public abstract class LevelMixin {
             CallbackInfo ci
     ) {
         output.removeIf(e -> e instanceof ILivingEntity living && living.isErased());
-    }
+    }*/
 }

@@ -16,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(ForgeHooks.class)
 public class ForgeHooksMixin {
-    @Inject(
+    /*@Inject(
             method = "onLivingTick",
             at = @At("HEAD"),
             cancellable = true,
@@ -27,9 +27,9 @@ public class ForgeHooksMixin {
             cir.setReturnValue(false);
             cir.cancel();
         }
-    }
+    }*/
 
-    @Inject(
+    /*@Inject(
             method = "onLivingDeath",
             at = @At("HEAD"),
             cancellable = true,
@@ -38,11 +38,10 @@ public class ForgeHooksMixin {
     private static void eraser$cancelLivingDeath(LivingEntity entity, DamageSource source, CallbackInfoReturnable<Boolean> cir) {
         if (entity instanceof ILivingEntity erased && erased.isErased()) {
             //System.out.println("[EraserMod] Skipped LivingDeathEvent for " + entity.getName().getString());
-            entity.setHealth(0);
             cir.setReturnValue(false);
             cir.cancel();
         }
-    }
+    }*/
 
 
     @Inject(

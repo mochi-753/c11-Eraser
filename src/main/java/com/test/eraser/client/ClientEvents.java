@@ -5,8 +5,10 @@ import com.mojang.math.Axis;
 import com.test.eraser.additional.ModItems;
 import com.test.eraser.additional.ModKeyBindings;
 import com.test.eraser.client.renderer.ShieldEffectRenderer;
+import com.test.eraser.items.Eraser_Item;
 import com.test.eraser.logic.ILivingEntity;
 import com.test.eraser.mixin.client.BossHelthOverlayAccessor;
+import com.test.eraser.network.packets.DestroyBlockPacket;
 import com.test.eraser.network.PacketHandler;
 import com.test.eraser.network.packets.EraserRangeAttackPacket;
 import com.test.eraser.network.packets.RayCastPacket;
@@ -19,6 +21,7 @@ import net.minecraft.client.gui.components.BossHealthOverlay;
 import net.minecraft.client.gui.components.LerpingBossEvent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -28,7 +31,10 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -41,6 +47,7 @@ import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -125,8 +132,38 @@ public class ClientEvents {
             }
         }
 
+        if (isInGameWorld() && mc.options.keyAttack.isDown() && (stack.getItem() == ModItems.ERASER_ITEM.get() || stack.getItem() == ModItems.WORLD_DESTROYER.get())) {
+
+            LocalPlayer player = Minecraft.getInstance().player;
+            if (player == null) return;
+
+            if (hit.getType() != HitResult.Type.BLOCK) return;
+
+            BlockPos pos = getPlayerLookingAt(mc.player, 5).getBlockPos();
+            DestroyMode mode = DestroyMode.getMode(player.getMainHandItem());
+
+            PacketHandler.CHANNEL.sendToServer(new DestroyBlockPacket(pos, mode));
+
+        }
     }
 
+    public static BlockHitResult getPlayerLookingAt(Player player, int reach) {
+        Level level = player.level();
+
+        Vec3 eyePosition = player.getEyePosition();
+        Vec3 lookVector = player.getLookAngle().scale(reach);
+        Vec3 endPosition = eyePosition.add(lookVector);
+
+        ClipContext context = new ClipContext(
+                eyePosition,
+                endPosition,
+                ClipContext.Block.COLLIDER,
+                ClipContext.Fluid.ANY,
+                player
+        );
+
+        return level.clip(context);
+    }
     @SubscribeEvent
     public static void onInput(InputEvent.MouseButton.Pre event) {
         Minecraft mc = Minecraft.getInstance();
@@ -134,8 +171,9 @@ public class ClientEvents {
         ItemStack stack = mc.player.getMainHandItem();
         if (event.getButton() == 1 && event.getAction() == 1 && mc.player.isShiftKeyDown() && stack.getItem() == ModItems.ERASER_ITEM.get()) {
             PacketHandler.CHANNEL.sendToServer(new EraserRangeAttackPacket());
+            mc.player.swing(mc.player.getUsedItemHand());
         }
-        if (event.getButton() == 0 && (stack.getItem() == ModItems.ERASER_ITEM.get() || stack.getItem() == ModItems.WORLD_DESTROYER.get())) {
+        if (isInGameWorld() && event.getButton() == 0 && event.getAction() == 1 && stack.getItem() == ModItems.WORLD_DESTROYER.get()) {
 
             HitResult hit = mc.hitResult;
             if (hit != null && hit.getType() == HitResult.Type.ENTITY) {
@@ -143,9 +181,29 @@ public class ClientEvents {
                 int id = entityHit.getEntity().getId();
                 PacketHandler.CHANNEL.sendToServer(new RayCastPacket(id));
             }
+            else {
+                LocalPlayer player = Minecraft.getInstance().player;
+                if (player == null) return;
+
+                BlockPos pos = ((BlockHitResult) hit).getBlockPos();
+                DestroyMode mode = DestroyMode.getMode(player.getMainHandItem());
+
+                PacketHandler.CHANNEL.sendToServer(new DestroyBlockPacket(pos, mode));
+            }
         }
     }
 
+    @SubscribeEvent
+    public static void onStartDestroyBlock(PlayerEvent event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) return;
+        ItemStack stack = mc.player.getMainHandItem();
+
+
+    }
+    public static boolean isInGameWorld() {
+        return Minecraft.getInstance().screen == null;
+    }
     /*@SubscribeEvent //shitty shield effect rendering
     public static void onRenderLevel(RenderLevelStageEvent event) {
         if (event.getStage() == RenderLevelStageEvent.Stage.AFTER_PARTICLES) {
@@ -165,7 +223,7 @@ public class ClientEvents {
         LivingEntity entity = event.getEntity();
         UUID uuid = entity.getUUID();
 
-        if (entity instanceof ILivingEntity living && living.isErased()) {
+        if (entity instanceof ILivingEntity living && living.isErased(uuid)) {
             long now = System.currentTimeMillis();
             long last = lastUpdate.getOrDefault(uuid, 0L);
 
@@ -186,7 +244,7 @@ public class ClientEvents {
                 if (mc == null || mc.player == null || mc.level == null) return;
 
                 //System.out.println(Component.literal("[Eraser] Prevented joining erased entity to level: " + event.getEntity().toString()));
-                event.setCanceled(true);
+                //event.setCanceled(true);
             }
         }
     }

@@ -16,7 +16,7 @@ public abstract class GameRendererMixin {
     private static void eraser$forceNightVision(LivingEntity entity, float partialTicks, CallbackInfoReturnable<Float> cir) {
         if (entity instanceof Player player) if (SnackArmor.SnackProtector.isFullSet(player)) {
             cir.setReturnValue(1.0F);
-            cir.cancel();
+            //cir.cancel();
             return;
         }
     }

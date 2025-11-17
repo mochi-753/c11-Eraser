@@ -24,8 +24,8 @@ public abstract class LivingEntityMixin {
     private void snackProtector$cancelDie(DamageSource source, CallbackInfo ci) {
         LivingEntity self = (LivingEntity) (Object) this;
         if (self instanceof Player player && SnackArmor.SnackProtector.isFullSet(player)) {
-            ci.cancel();
-            self.setHealth(self.getMaxHealth());
+            //ci.cancel();
+            //self.setHealth(self.getMaxHealth());
         }
     }
 

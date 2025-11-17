@@ -18,7 +18,7 @@ public class SetScreenMixin {//for witherzilla
         if (Minecraft.getInstance() == null) return;
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || mc.level == null) return;
-        if ((SnackArmor.SnackProtector.isFullSet(mc.player) && mc.player.isAlive()) && !((ILivingEntity) mc.player).isErased())
+        if ((SnackArmor.SnackProtector.isFullSet(mc.player) && mc.player.isAlive()) && !((ILivingEntity) mc.player).isErased(mc.player.getUUID()))
             if (screen instanceof DeathScreen) {
                 ci.cancel();
             }

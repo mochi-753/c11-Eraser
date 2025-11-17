@@ -56,7 +56,7 @@ public class EntityMixin {
     @Inject(method = "tick", at = @At("HEAD"), cancellable = true)
     private void onTick(CallbackInfo ci) {
         if ((Object)this instanceof ILivingEntity living && living.isErased()) {
-            if (!Config.isNormalDieEntity(((Entity)((Object)this))))ci.cancel();
+            //if (!Config.isNormalDieEntity(((Entity)((Object)this))))ci.cancel();
         }
     }
 

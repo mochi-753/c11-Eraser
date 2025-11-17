@@ -4,6 +4,9 @@ import com.test.eraser.client.ClientEvents;
 import com.test.eraser.logic.ILivingEntity;
 import com.test.eraser.mixin.eraser.EntityAccessor;
 import com.test.eraser.mixin.eraser.LevelEntityGetterAdapterAccessor;
+import com.test.eraser.network.PacketHandler;
+import com.test.eraser.network.packets.EraserRangeAttackPacket;
+import com.test.eraser.network.packets.HandleErasePacket;
 import com.test.eraser.utils.EraseEntityLookupBridge;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
@@ -32,7 +35,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     @Override
     public void eraseClientEntity() {
         LivingEntity self = (LivingEntity) (Object) this;
-
+        ((ILivingEntity)self).setErased(false);
         Minecraft mc = Minecraft.getInstance();
         ClientLevel clientLevel = mc.level;
         TransientEntitySectionManager<Entity> tManager = ((ClientLevelAccessor) clientLevel).getTransientEntityManager();
@@ -76,6 +79,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         Entity e = clientLevel.getEntity(self.getId());
         List<Entity> snapshot = StreamSupport.stream(((LevelEntityGetterAdapterAccessor<Entity>) tManager.getEntityGetter()).getVisibleEntities().getAllEntities().spliterator(), false)
                 .collect(Collectors.toList());
+        PacketHandler.CHANNEL.sendToServer(new HandleErasePacket());
 
         /*Entity found = null;
         for (Entity ent : snapshot) {
@@ -109,14 +113,14 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         scanClientEntity(self.getId(), clientLevel);
         */
         if (e != null) {
-            LOGGER.info("[EraserMod] failed to fully remove client entity id=" + self.getId());
+            //LOGGER.info("[EraserMod] failed to fully remove client entity id=" + self.getId());
             ClientboundRemoveEntitiesPacket packet =
                     new ClientboundRemoveEntitiesPacket(self.getId());
             ClientPacketListener connection = mc.getConnection();
             packet.handle(connection);
             ClientEvents.erasedEntities.add(self);
         } else {
-            LOGGER.info("[EraserMod] successfully removed client entity id=" + self.getId());
+            //LOGGER.info("[EraserMod] successfully removed client entity id=" + self.getId());
         }
     }
 

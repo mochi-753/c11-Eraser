@@ -14,7 +14,7 @@ public class ServerLevelEntityCallbacksMixin {
     @Inject(method = "onTrackingStart", at = @At("HEAD"), cancellable = true)
     private void onTrackingStart(Entity entity, CallbackInfo ci) {
         if (entity instanceof ILivingEntity erase && erase.isErased()) {
-            ci.cancel();
+            //ci.cancel();
         }
     }
 }

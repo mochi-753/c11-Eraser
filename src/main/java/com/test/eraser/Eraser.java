@@ -44,6 +44,7 @@ public class Eraser {
         ModItems.ITEMS.register(modEventBus);
         ModCreativeTabs.TABS.register(modEventBus);
         ModEntities.ENTITIES.register(modEventBus);
+        ModMenus.MENUS.register(FMLJavaModLoadingContext.get().getModEventBus());
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
 

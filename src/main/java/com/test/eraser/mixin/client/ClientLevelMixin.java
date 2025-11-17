@@ -20,7 +20,7 @@ public abstract class ClientLevelMixin {
         if(entity instanceof ILivingEntity erase && erase.isErased()) {
             LOGGER.info("[Eraser Client] cancel addEntity id={} uuid={} class={} pos={}",
                     id, entity.getUUID(), entity.getClass().getSimpleName(), entity.blockPosition());
-            ci.cancel();
+            //ci.cancel();
         }
     }
 }
