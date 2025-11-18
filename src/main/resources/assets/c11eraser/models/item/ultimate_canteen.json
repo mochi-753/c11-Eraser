@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "eraser:item/null_ingot"
+    "layer0": "c11eraser:item/ultimate_canteen"
   }
 }

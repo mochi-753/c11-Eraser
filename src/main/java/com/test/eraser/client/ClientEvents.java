@@ -16,6 +16,7 @@ import com.test.eraser.network.packets.WorldDestroyerChangeModePacket;
 import com.test.eraser.utils.DestroyMode;
 import com.test.eraser.utils.RenderUtils;
 import com.test.eraser.utils.Res;
+import com.test.eraser.utils.WorldDestroyerUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.BossHealthOverlay;
 import net.minecraft.client.gui.components.LerpingBossEvent;
@@ -26,8 +27,10 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Pose;
@@ -39,6 +42,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.*;
+import net.minecraftforge.accesstransformer.INameHandler;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.InputEvent;
@@ -48,6 +52,7 @@ import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -61,7 +66,7 @@ import static com.test.eraser.utils.RenderUtils.renderBlockList;
 public class ClientEvents {
 
     public static final List<Entity> erasedEntities = new ArrayList<>();
-
+    private static int tick = 0;
     @SubscribeEvent
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         Minecraft mc = Minecraft.getInstance();
@@ -132,18 +137,22 @@ public class ClientEvents {
             }
         }
 
-        if (isInGameWorld() && mc.options.keyAttack.isDown() && (stack.getItem() == ModItems.ERASER_ITEM.get() || stack.getItem() == ModItems.WORLD_DESTROYER.get())) {
-
+        if (isInGameWorld() && mc.options.keyAttack.isDown() && stack.getItem() == ModItems.WORLD_DESTROYER.get()) {
+            if(mc.options.keyShift.isDown() && tick < 7){
+                tick++;
+                return;
+            }
+            tick = 0;
             LocalPlayer player = Minecraft.getInstance().player;
             if (player == null) return;
 
-            if (hit.getType() != HitResult.Type.BLOCK) return;
+            if (hit.getType() == HitResult.Type.ENTITY) return;
 
             BlockPos pos = getPlayerLookingAt(mc.player, 5).getBlockPos();
             DestroyMode mode = DestroyMode.getMode(player.getMainHandItem());
 
             PacketHandler.CHANNEL.sendToServer(new DestroyBlockPacket(pos, mode));
-
+            player.swing(InteractionHand.MAIN_HAND);
         }
     }
 
@@ -164,6 +173,24 @@ public class ClientEvents {
 
         return level.clip(context);
     }
+
+    @SubscribeEvent
+    public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
+        Player player = event.getEntity();
+        if (player instanceof ServerPlayer serverPlayer) {
+            if (player == null) return;
+            ItemStack stack = serverPlayer.getMainHandItem();
+            if (isInGameWorld() && stack.getItem() == ModItems.WORLD_DESTROYER.get()) {
+                if(!player.isShiftKeyDown()) {
+                    //WorldDestroyerUtils.destroyblock(serverPlayer.getMainHandItem(), serverPlayer);
+                }
+                else{
+                    event.setCanceled(true);
+                }
+            }
+        }
+    }
+
     @SubscribeEvent
     public static void onInput(InputEvent.MouseButton.Pre event) {
         Minecraft mc = Minecraft.getInstance();

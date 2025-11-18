@@ -48,7 +48,8 @@
     "world_destroyer.LevelChunkMixin",
     "world_destroyer.LevelChunkAccessor",
     "world_destroyer.LevelChunkSectionAccessor",
-    "world_destroyer.LevelChunkSectionMixin"
+    "world_destroyer.LevelChunkSectionMixin",
+    "world_destroyer.BlockStateBaseMixin"
   ],
   "injectors": { "defaultRequire": 1 }
 }

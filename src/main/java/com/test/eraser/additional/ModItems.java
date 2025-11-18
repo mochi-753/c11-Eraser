@@ -2,16 +2,20 @@ package com.test.eraser.additional;
 
 import com.test.eraser.Eraser;
 import com.test.eraser.items.*;
+import com.test.eraser.utils.Deets;
 import net.minecraft.world.item.Item;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
-
+import static com.test.eraser.utils.Deets.*;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS =
+            DeferredRegister.create(ForgeRegistries.ITEMS, Eraser.MODID);
+
+    public static final DeferredRegister<Item> ADDON_ITEMS =
             DeferredRegister.create(ForgeRegistries.ITEMS, Eraser.MODID);
 
     public static final RegistryObject<Item> ERASER_ITEM =
@@ -37,6 +41,9 @@ public class ModItems {
 
     public static final RegistryObject<Item> CANTEEN_ITEM =
             ITEMS.register("ultimate_canteen", () -> new UltimaCanteen(new Item.Properties().stacksTo(1)));
+
+    public static final RegistryObject<Item> ERASER_ERASER =
+            ADDON_ITEMS.register("eraser_eraser", () -> new Eraser_Eraser(new Item.Properties().stacksTo(1)));
 
     public static List<Item> getAllItems() {
         return ITEMS.getEntries().stream()

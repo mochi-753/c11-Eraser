@@ -26,6 +26,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mixin(ItemRenderer.class)
 public abstract class ItemRendererMixin {
@@ -35,8 +36,16 @@ public abstract class ItemRendererMixin {
             ModItems.SNACK_CHESTPLATE,
             ModItems.SNACK_LEGGINGS,
             ModItems.SNACK_BOOTS,
-            ModItems.NULL_INGOT
+            ModItems.NULL_INGOT,
+            ModItems.ERASER_ERASER
     );
+
+    private static List<Item> getAffectedItems() {
+        return AFFECTED_ITEMS.stream()
+                .filter(RegistryObject::isPresent)
+                .map(RegistryObject::get)
+                .collect(Collectors.toList());
+    }
 
     private static boolean shouldAffect(ItemStack stack, ItemDisplayContext ctx) {
         boolean inHand =
@@ -47,9 +56,11 @@ public abstract class ItemRendererMixin {
 
         boolean inGui = ctx == ItemDisplayContext.GUI;
 
-        return (inHand || inGui) && AFFECTED_ITEMS.stream()
-                .map(RegistryObject::get)
-                .anyMatch(stack::is);
+        List<Item> currentAffectedItems = getAffectedItems();
+        return (inHand || inGui) && (
+                ModItems.getAllItems().stream().anyMatch(stack::is) ||
+                        currentAffectedItems.stream().anyMatch(stack::is)
+        );
     }
 
     private static boolean isHeldContext(ItemDisplayContext ctx) {
@@ -68,8 +79,11 @@ public abstract class ItemRendererMixin {
 
         boolean inGui = ctx == ItemDisplayContext.GUI;
 
-        return (inHand || inGui) && ModItems.getAllItems().stream()
-                .anyMatch(stack::is);
+        List<Item> currentAffectedItems = getAffectedItems();
+        return (inHand || inGui) && (
+                ModItems.getAllItems().stream().anyMatch(stack::is) ||
+                        currentAffectedItems.stream().anyMatch(stack::is)
+        );
     }
 
     private static int waveGrayWhiteColor(long time, int index, double speed) {

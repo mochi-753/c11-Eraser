@@ -2,7 +2,7 @@ package com.test.eraser.client.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.test.eraser.client.utils.RenderUtils;
+import com.test.eraser.utils.RenderUtils;
 import com.test.eraser.utils.Res;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;

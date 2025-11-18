@@ -15,6 +15,7 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.entity.*;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -74,12 +75,12 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         ((EntityAccessor)(self)).setRemovalReason(Entity.RemovalReason.KILLED);
         //removeFromOtherIndexes(self.getUUID(), clientLevel, tManager);
         clientLevel.removeEntity(self.getId(), Entity.RemovalReason.KILLED);
-        self.remove(Entity.RemovalReason.KILLED);
+        //self.remove(Entity.RemovalReason.KILLED);
         self.invalidateCaps();
         Entity e = clientLevel.getEntity(self.getId());
         List<Entity> snapshot = StreamSupport.stream(((LevelEntityGetterAdapterAccessor<Entity>) tManager.getEntityGetter()).getVisibleEntities().getAllEntities().spliterator(), false)
                 .collect(Collectors.toList());
-        PacketHandler.CHANNEL.sendToServer(new HandleErasePacket());
+        if(self instanceof Player)PacketHandler.CHANNEL.sendToServer(new HandleErasePacket());
 
         /*Entity found = null;
         for (Entity ent : snapshot) {
@@ -114,10 +115,10 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         */
         if (e != null) {
             //LOGGER.info("[EraserMod] failed to fully remove client entity id=" + self.getId());
-            ClientboundRemoveEntitiesPacket packet =
+            /*ClientboundRemoveEntitiesPacket packet =
                     new ClientboundRemoveEntitiesPacket(self.getId());
             ClientPacketListener connection = mc.getConnection();
-            packet.handle(connection);
+            packet.handle(connection);*/
             ClientEvents.erasedEntities.add(self);
         } else {
             //LOGGER.info("[EraserMod] successfully removed client entity id=" + self.getId());
@@ -146,7 +147,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             TransientEntitySectionManager<?> tManager = ((ClientLevelAccessor) level).getTransientEntityManager();
             Object getterObj = tManager.getEntityGetter();
             EntityLookup<?> visible = ((LevelEntityGetterAdapterAccessor<?>) getterObj).getVisibleEntities();
-            Iterable<?> all = ((EntityLookup<?>) visible).getAllEntities();
+            Iterable<?> all = visible.getAllEntities();
             for (Object o : all) {
                 if (o instanceof Entity ent && id == ent.getId()) {
                     LOGGER.info("[EraserMod] found in visible lookup id={} class={}", id, o.getClass().getName());

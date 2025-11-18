@@ -95,10 +95,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         self.setPose(Pose.DYING);
         //SynchedEntityDataUtil.forceSet(self.getEntityData(), EntityAccessor.getDataPoseId(), 0.0F);
         if (this.isErased() || self.level().isClientSide) return;
-        markErased(self.getUUID());
-        for (ServerPlayer sp : ((ServerLevel)self.level()).players()) {
-            PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), new EraseEntityPacket(self.getUUID()));
-        }
+
         DamageSource eraseSrc = ModDamageSources.erase(self, attacker);
         EntityDataAccessor<Float> healthId = LivingEntityAccessor.getDataHealthId();
         //self.hurt(eraseSrc,Float.MAX_VALUE);
@@ -108,9 +105,14 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         ((LivingEntityAccessor) self).setLastHurtByPlayerTime(1);
         self.getCombatTracker().recordDamage(eraseSrc, Float.MAX_VALUE);
         if(self.level().isClientSide()) return;
-        this.setErased(true);
-        if (Config.isNormalDieEntity(self)) {/*((LivingEntityAccessor) self).callDie(eraseSrc);*/}
+
+        if (Config.isNormalDieEntity(self)) {((LivingEntityAccessor) self).callDie(eraseSrc);}
         else if (Config.FORCE_DIE.get()) {
+            markErased(self.getUUID());
+            for (ServerPlayer sp : ((ServerLevel)self.level()).players()) {
+                PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), new EraseEntityPacket(self.getUUID()));
+            }
+            this.setErased(true);
             forcedie(eraseSrc);
             if (!(self instanceof ServerPlayer))
                 TaskScheduler.schedule(this::forceErase, 21);

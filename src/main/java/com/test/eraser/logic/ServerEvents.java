@@ -37,6 +37,7 @@ import net.minecraftforge.event.entity.living.LootingLevelEvent;
 import net.minecraftforge.event.entity.player.AttackEntityEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.level.ChunkDataEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -202,19 +203,6 @@ public class ServerEvents {
         }
         if (event.getEntity() instanceof Player player && SnackArmor.SnackProtector.hasSnackProtector(player)) {
             event.setAmount(0);
-        }
-    }
-
-    @SubscribeEvent
-    public static void onLeftClickBlock(PlayerInteractEvent.LeftClickBlock event) {
-        Player player = event.getEntity();
-        if(player instanceof ServerPlayer serverPlayer) {
-            if (player == null) return;
-            ItemStack stack = serverPlayer.getMainHandItem();
-            if (isInGameWorld() && (stack.getItem() == ModItems.ERASER_ITEM.get() || stack.getItem() == ModItems.WORLD_DESTROYER.get())) {
-
-                WorldDestroyerUtils.destroyblock(serverPlayer.getMainHandItem(), serverPlayer);
-            }
         }
     }
 

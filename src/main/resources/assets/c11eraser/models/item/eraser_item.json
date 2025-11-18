@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "c11eraser:item/eraser_item",
+    "layer1": "c11eraser:item/eraser_item_layer2"
+  }
+}

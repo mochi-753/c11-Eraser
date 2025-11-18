@@ -1,6 +1,6 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "eraser:item/snack_protect_leggings"
+    "layer0": "c11eraser:item/snack_protect_leggings"
   }
 }
