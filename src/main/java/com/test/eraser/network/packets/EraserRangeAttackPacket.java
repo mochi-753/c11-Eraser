@@ -1,6 +1,7 @@
 package com.test.eraser.network.packets;
 
 import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.utils.Eraser_Utils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -35,7 +36,7 @@ public class EraserRangeAttackPacket {
                 );
 
                 for (LivingEntity target : targets) {
-                    if (target instanceof ILivingEntity target_) target_.instantKill(player);
+                    if (target instanceof ILivingEntity target_) Eraser_Utils.killIfParentFound(target, player, 32);
                 }
             }
         });

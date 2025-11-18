@@ -63,7 +63,7 @@ public class Eraser_Eraser extends Item {
     public @NotNull InteractionResult interactLivingEntity(ItemStack stack, Player player, LivingEntity target, InteractionHand hand) {
         if (!player.level().isClientSide() && !target.level().isClientSide()) {
             playSound(target, player.level());
-            killIfParentFound(target, player, 16);
+            killIfParentFound(target, player, 16, true);
         }
         return InteractionResult.SUCCESS;
     }
@@ -74,7 +74,7 @@ public class Eraser_Eraser extends Item {
             if (player.isCrouching()) {
                 double eraseRadius = EraserConfig.COMMON.eraseRadius.get();
                 List<LivingEntity> targets = player.level().getEntitiesOfClass(LivingEntity.class, player.getBoundingBox().inflate(eraseRadius), p -> p != player);
-                targets.forEach((target) -> killIfParentFound(target, player, 16));
+                targets.forEach((target) -> killIfParentFound(target, player, 16, true));
                 player.getItemInHand(hand).hurtAndBreak(1, player, (p) -> p.broadcastBreakEvent(hand));
             }
         }

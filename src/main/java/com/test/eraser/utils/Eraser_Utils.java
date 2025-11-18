@@ -38,15 +38,28 @@ public class Eraser_Utils {
         if (findParentEntity(self, searchRadius) instanceof ILivingEntity entity) {
 
             if (attacker instanceof Player player) {
-                entity.instantKill(player);
+                entity.instantKill(player, false);
                 return true;
             }
         }
         if(self instanceof ILivingEntity entity && attacker instanceof Player player)
-            entity.instantKill(player);
+            entity.instantKill(player, false);
 
         return false;
     }
 
+    public static boolean killIfParentFound(Entity self, Entity attacker, double searchRadius, boolean skipAnimation) {
+        if (findParentEntity(self, searchRadius) instanceof ILivingEntity entity) {
+
+            if (attacker instanceof Player player) {
+                entity.instantKill(player, skipAnimation);
+                return true;
+            }
+        }
+        if(self instanceof ILivingEntity entity && attacker instanceof Player player)
+            entity.instantKill(player, skipAnimation);
+
+        return false;
+    }
 }
 

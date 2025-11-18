@@ -17,17 +17,20 @@ import java.util.function.Supplier;
 
 public class EraseEntityPacket {
     public final UUID entityUuid;
+    public final boolean skipAnimation;
 
-    public EraseEntityPacket(UUID entityUuid) {
+    public EraseEntityPacket(UUID entityUuid, boolean skipAnimation) {
         this.entityUuid = entityUuid;
+        this.skipAnimation = skipAnimation;
     }
 
     public static void encode(EraseEntityPacket msg, FriendlyByteBuf buf) {
         buf.writeUUID(msg.entityUuid);
+        buf.writeBoolean(msg.skipAnimation);
     }
 
     public static EraseEntityPacket decode(FriendlyByteBuf buf) {
-        return new EraseEntityPacket(buf.readUUID());
+        return new EraseEntityPacket(buf.readUUID(), buf.readBoolean());
     }
 
     public static void handle(EraseEntityPacket msg, Supplier<NetworkEvent.Context> ctx) {

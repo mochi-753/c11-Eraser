@@ -39,7 +39,10 @@ public class ClientPacketHandler {
                 //erased.setErased(true);
                 erased.markErased(e.getUUID());
 
-                if(!(e instanceof Player))TaskScheduler.schedule(erased::eraseClientEntity, 22);
+                if(!(e instanceof Player)) {
+                    if(msg.skipAnimation) erased.eraseClientEntity();
+                    else TaskScheduler.schedule(erased::eraseClientEntity, 22);
+                }
 
             }
         }

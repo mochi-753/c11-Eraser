@@ -166,7 +166,7 @@ public class ClientEvents {
         ClipContext context = new ClipContext(
                 eyePosition,
                 endPosition,
-                ClipContext.Block.COLLIDER,
+                ClipContext.Block.VISUAL,
                 ClipContext.Fluid.ANY,
                 player
         );
@@ -212,7 +212,7 @@ public class ClientEvents {
                 LocalPlayer player = Minecraft.getInstance().player;
                 if (player == null) return;
 
-                BlockPos pos = ((BlockHitResult) hit).getBlockPos();
+                BlockPos pos = getPlayerLookingAt(mc.player, 5).getBlockPos();
                 DestroyMode mode = DestroyMode.getMode(player.getMainHandItem());
 
                 PacketHandler.CHANNEL.sendToServer(new DestroyBlockPacket(pos, mode));

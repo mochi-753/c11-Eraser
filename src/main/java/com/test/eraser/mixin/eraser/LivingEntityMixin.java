@@ -14,6 +14,7 @@ import net.minecraft.core.SectionPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBossEventPacket;
 import net.minecraft.network.protocol.game.ClientboundPlayerCombatKillPacket;
+import net.minecraft.network.protocol.game.ClientboundRemoveEntitiesPacket;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.server.level.ChunkMap;
 import net.minecraft.server.level.ServerBossEvent;
@@ -90,7 +91,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
     }
 
     @Override
-    public void instantKill(Player attacker) {
+    public void instantKill(Player attacker,boolean SkipAnimation) {
         LivingEntity self = (LivingEntity) (Object) this;
         self.setPose(Pose.DYING);
         //SynchedEntityDataUtil.forceSet(self.getEntityData(), EntityAccessor.getDataPoseId(), 0.0F);
@@ -110,12 +111,15 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         else if (Config.FORCE_DIE.get()) {
             markErased(self.getUUID());
             for (ServerPlayer sp : ((ServerLevel)self.level()).players()) {
-                PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), new EraseEntityPacket(self.getUUID()));
+                PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), new EraseEntityPacket(self.getUUID(), SkipAnimation));
             }
             this.setErased(true);
             forcedie(eraseSrc);
-            if (!(self instanceof ServerPlayer))
-                TaskScheduler.schedule(this::forceErase, 21);
+            if(!SkipAnimation) {
+                if (!(self instanceof ServerPlayer))
+                    TaskScheduler.schedule(this::forceErase, 21);
+            }
+            else forceErase();
         }
         //ServerLevel dest = self.getServer().getLevel(Level.OVERWORLD);
         //if (dest == null) return;
@@ -149,7 +153,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
 
     @Override
     public void instantKill() {
-        instantKill((Player) null);
+        instantKill((Player) null, false);
     }
 
     @Unique
@@ -193,6 +197,7 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             boolean debug = false;
             self.stopRiding();
             self.invalidateCaps();
+
             ((EntityAccessor) self).setlevelCallback(EntityInLevelCallback.NULL);
             EntityTickList tickList = ((ServerLevelAccessor) serverLevel).getEntityTickList();
             Int2ObjectMap<Entity> active = ((EntityTickListAccessor) tickList).getActive();

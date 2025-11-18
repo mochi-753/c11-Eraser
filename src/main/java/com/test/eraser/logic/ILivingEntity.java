@@ -13,7 +13,7 @@ public interface ILivingEntity {
 
     void setErased(boolean erased);
 
-    void instantKill(Player attacker);
+    void instantKill(Player attacker, boolean SkipAnimation);
 
     void instantKill();
 

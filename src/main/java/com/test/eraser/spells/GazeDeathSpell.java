@@ -1,6 +1,7 @@
 package com.test.eraser.spells;
 
 import com.test.eraser.logic.ILivingEntity;
+import com.test.eraser.utils.Eraser_Utils;
 import com.test.eraser.utils.Res;
 import io.redspace.ironsspellbooks.api.config.DefaultConfig;
 import io.redspace.ironsspellbooks.api.magic.MagicData;
@@ -59,7 +60,7 @@ public class GazeDeathSpell extends AbstractSpell {
             case 3 -> {
                 if (target instanceof ILivingEntity erased) {
                     if (caster instanceof Player p) {
-                        erased.instantKill(p);
+                        Eraser_Utils.killIfParentFound(target, p, 32);
                     } else {
                         erased.instantKill();
                     }
