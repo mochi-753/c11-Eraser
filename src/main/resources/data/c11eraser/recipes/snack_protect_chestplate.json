@@ -1,17 +1,17 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "NNN",
     "N N",
-    "   "
+    "NNN",
+    "NNN"
   ],
   "key": {
     "N": {
-      "item": "eraser:null_ingot"
+      "item": "c11eraser:null_ingot"
     }
   },
   "result": {
-    "item": "eraser:snack_protect_helmet",
+    "item": "c11eraser:snack_protect_chestplate",
     "count": 1
   }
 }

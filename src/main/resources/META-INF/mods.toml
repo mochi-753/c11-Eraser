@@ -11,14 +11,14 @@ description='''
 A mod that erases entities instantly.
 '''
 
-[[dependencies.eraser]]
+[[dependencies.c11eraser]]
 modId="forge"
 mandatory=true
 versionRange="[47,)" # 1.20.x?
 ordering="NONE"
 side="BOTH"
 
-[[dependencies.eraser]]
+[[dependencies.c11eraser]]
 modId="minecraft"
 mandatory=true
 versionRange="[1.20.1]"

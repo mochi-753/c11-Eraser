@@ -1,5 +1,6 @@
 package com.test.eraser.spells;
 
+import com.test.eraser.Eraser;
 import com.test.eraser.logic.ILivingEntity;
 import com.test.eraser.utils.Eraser_Utils;
 import com.test.eraser.utils.Res;
@@ -117,6 +118,6 @@ public class GazeDeathSpell extends AbstractSpell {
 
     @Override
     public ResourceLocation getSpellResource() {
-        return  Res.getResource("eraser", "gaze_death");
+        return  Res.getResource(Eraser.MODID, "gaze_death");
     }
 }

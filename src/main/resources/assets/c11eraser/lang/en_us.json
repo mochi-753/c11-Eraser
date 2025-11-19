@@ -1,23 +1,23 @@
 {
-  "item.eraser.eraser_item": "eraser.",
+  "item.c11eraser.eraser_item": "eraser.",
   "death.attack.erase": "%1$s has become eraser crumbs",
   "death.attack.erase.player": "%1$s was turned into eraser crumbs by %2$s",
-  "item.eraser.null_ingot": "? Ingot",
-  "item.eraser.null_ingot.desc": "A strangely soft ingot that no one really understands, but it looks powerful.",
-  "item.eraser.eraser_item": "eraser.",
-  "item.eraser.eraser_item.desc": "Kind of like a soft sword-looking thing.",
-  "item.eraser.world_destroyer": "Snack Destroyer",
-  "item.eraser.world_destroyer.desc": "Grandpa, didn't you already have your snack?",
+  "item.c11eraser.null_ingot": "? Ingot",
+  "item.c11eraser.null_ingot.desc": "A strangely soft ingot that no one really understands, but it looks powerful.",
+  "item.c11eraser.eraser_item": "eraser.",
+  "item.c11eraser.eraser_item.desc": "Kind of like a soft sword-looking thing.",
+  "item.c11eraser.world_destroyer": "Snack Destroyer",
+  "item.c11eraser.world_destroyer.desc": "Grandpa, didn't you already have your snack?",
   "key.categories.world_destroyer": "World Destroyer",
   "key.world_destroyer.toggle_range": "Toggle Range",
   "item.erasers.use": "When used:",
   "item.erasers.sneak_use": "When Sneak and Use:",
 
-  "item.eraser.snack_protect_helmet": "Snack Protector Helmet",
-  "item.eraser.snack_protect_chestplate": "Snack Protector Chestplate",
-  "item.eraser.snack_protect_leggings": "Snack Protector Leggings",
-  "item.eraser.snack_protect_boots": "Snack Protector Boots",
+  "item.c11eraser.snack_protect_helmet": "Snack Protector Helmet",
+  "item.c11eraser.snack_protect_chestplate": "Snack Protector Chestplate",
+  "item.c11eraser.snack_protect_leggings": "Snack Protector Leggings",
+  "item.c11eraser.snack_protect_boots": "Snack Protector Boots",
 
-  "item.eraser.eraser_eraser": "Eraser Eraser",
-  "item.eraser.eraser_eraser.desc": "Huh? Grammar’s off? Well, I ain’t a native speaker, so I wouldn’t know."
+  "item.c11eraser.eraser_eraser": "Eraser Eraser",
+  "item.c11eraser.eraser_eraser.desc": "Huh? Grammar’s off? Well, I ain’t a native speaker, so I wouldn’t know."
 }

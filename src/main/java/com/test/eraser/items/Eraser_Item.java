@@ -177,7 +177,7 @@ public class Eraser_Item extends SwordItem {
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         long gameTime = (level != null) ? level.getGameTime() : 0;
 
-        String desc = Component.translatable("item.eraser.eraser_item.desc").getString();
+        String desc = Component.translatable("item.c11eraser.eraser_item.desc").getString();
         var waveLine = Component.empty();
         for (int i = 0; i < desc.length(); i++) {
             char c = desc.charAt(i);

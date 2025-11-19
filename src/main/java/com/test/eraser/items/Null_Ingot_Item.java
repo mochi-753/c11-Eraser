@@ -42,7 +42,7 @@ public class Null_Ingot_Item extends Item {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         long gameTime = (level != null) ? level.getGameTime() : 0;
-        String desc = Component.translatable("item.eraser.null_ingot.desc").getString();
+        String desc = Component.translatable("item.c11eraser.null_ingot.desc").getString();
 
         String[] parts = desc.split(" ");
         var waveLine = Component.empty();

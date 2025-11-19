@@ -1,20 +1,20 @@
 {
   "type": "minecraft:crafting_shaped",
   "pattern": [
-    "  N",
-    " N ",
-    "S  "
+    "NNN",
+    " S ",
+    " S "
   ],
   "key": {
     "N": {
-      "item": "eraser:null_ingot"
+      "item": "c11eraser:null_ingot"
     },
     "S": {
       "tag": "forge:rods/wooden"
     }
   },
   "result": {
-    "item": "eraser:eraser_item",
+    "item": "c11eraser:world_destroyer",
     "count": 1
   }
 }

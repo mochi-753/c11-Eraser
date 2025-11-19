@@ -13,6 +13,6 @@
   "avoids_guardian_thorns": true,
   "always_hurts_ender_dragons": true,
   "values": [
-    "eraser:erase"
+    "c11eraser:erase"
   ]
 }

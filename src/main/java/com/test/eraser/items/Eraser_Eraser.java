@@ -47,7 +47,7 @@ public class Eraser_Eraser extends Item {
 
     @Override
     public Component getName(ItemStack stack) {
-        String text = Component.translatable("item.eraser.eraser_eraser").getString();
+        String text = Component.translatable("item.c11eraser.eraser_eraser").getString();
         var result = Component.empty();
         long time = System.currentTimeMillis() / 50;
 
@@ -89,7 +89,7 @@ public class Eraser_Eraser extends Item {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         long gameTime = (level != null) ? level.getGameTime() : 0;
-        String desc = Component.translatable("item.eraser.eraser_eraser.desc").getString();
+        String desc = Component.translatable("item.c11eraser.eraser_eraser.desc").getString();
 
         String[] parts = desc.split(" ");
         var waveLine = Component.empty();

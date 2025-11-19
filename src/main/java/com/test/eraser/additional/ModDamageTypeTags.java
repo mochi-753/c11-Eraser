@@ -1,5 +1,6 @@
 package com.test.eraser.additional;
 
+import com.test.eraser.Eraser;
 import com.test.eraser.utils.Res;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
@@ -18,14 +19,14 @@ public class ModDamageTypeTags extends TagsProvider<DamageType> {
     public ModDamageTypeTags(PackOutput output,
                              CompletableFuture<HolderLookup.Provider> lookupProvider,
                              ExistingFileHelper helper) {
-        super(output, Registries.DAMAGE_TYPE, lookupProvider, "eraser", helper);
+        super(output, Registries.DAMAGE_TYPE, lookupProvider, Eraser.MODID, helper);
     }
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
         HolderLookup.RegistryLookup<DamageType> damageLookup = provider.lookupOrThrow(Registries.DAMAGE_TYPE);
 
-        ResourceKey<DamageType> eraseKey = ResourceKey.create(Registries.DAMAGE_TYPE, Res.getResource("eraser", "erase"));
+        ResourceKey<DamageType> eraseKey = ResourceKey.create(Registries.DAMAGE_TYPE, Res.getResource(Eraser.MODID, "erase"));
 
         Holder.Reference<DamageType> eraseHolder = damageLookup.getOrThrow(eraseKey);
 

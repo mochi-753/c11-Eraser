@@ -1,17 +1,17 @@
 {
   "death.attack.erase": "%1$s は消しゴムのカスになった",
   "death.attack.erase.player": "%1$s は %2$s に消しゴムのカスにされた",
-  "item.eraser.null_ingot": "?インゴット",
-  "item.eraser.null_ingot.desc": "何かよー分からんけど柔らかいインゴット　強そう",
-  "item.eraser.eraser_item": "Eraser.",
-  "item.eraser.eraser_item.desc": "なんか柔らかい剣っぽいやつ",
-  "item.eraser.world_destroyer": "Snack Destroyer",
-  "item.eraser.world_destroyer.desc": "おじいちゃん?おやつはもう食べたでしょう?",
+  "item.c11eraser.null_ingot": "?インゴット",
+  "item.c11eraser.null_ingot.desc": "何かよー分からんけど柔らかいインゴット　強そう",
+  "item.c11eraser.eraser_item": "Eraser.",
+  "item.c11eraser.eraser_item.desc": "なんか柔らかい剣っぽいやつ",
+  "item.c11eraser.world_destroyer": "Snack Destroyer",
+  "item.c11eraser.world_destroyer.desc": "おじいちゃん?おやつはもう食べたでしょう?",
   "key.categories.world_destroyer": "ワールドデストロイヤー",
   "key.world_destroyer.toggle_range": "破壊範囲切替",
   "item.erasers.use": "使用したとき:",
   "item.erasers.sneak_use": "スニークしながら使用したとき:",
 
-  "item.eraser.eraser_eraser": "Eraser 消しゴム",
-  "item.eraser.eraser_eraser.desc": "ん?何いってんだって?  ...知らんな。"
+  "item.c11eraser.eraser_eraser": "Eraser 消しゴム",
+  "item.c11eraser.eraser_eraser.desc": "ん?何いってんだって?  ...知らんな。"
 }

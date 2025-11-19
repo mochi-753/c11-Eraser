@@ -3,15 +3,15 @@
   "pattern": [
     "NNN",
     "N N",
-    "N N"
+    "   "
   ],
   "key": {
     "N": {
-      "item": "eraser:null_ingot"
+      "item": "c11eraser:null_ingot"
     }
   },
   "result": {
-    "item": "eraser:snack_protect_leggings",
+    "item": "c11eraser:snack_protect_helmet",
     "count": 1
   }
 }

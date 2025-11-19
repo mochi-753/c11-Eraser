@@ -51,7 +51,7 @@ public class World_Destroyer_Item extends PickaxeItem {
 
     @Override
     public Component getName(ItemStack stack) {
-        String text = Component.translatable("item.eraser.world_destroyer").getString();
+        String text = Component.translatable("item.c11eraser.world_destroyer").getString();
         var result = Component.empty();
         long time = System.currentTimeMillis() / 50;
 
@@ -90,7 +90,7 @@ public class World_Destroyer_Item extends PickaxeItem {
             }
         }
 
-        String desc = Component.translatable("item.eraser.world_destroyer.desc").getString();
+        String desc = Component.translatable("item.c11eraser.world_destroyer.desc").getString();
         String[] parts = desc.split(" ");
         var waveLineNormal = Component.empty();
 

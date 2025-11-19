@@ -1,5 +1,6 @@
 package com.test.eraser.network;
 
+import com.test.eraser.Eraser;
 import com.test.eraser.utils.Res;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkRegistry;
@@ -9,7 +10,7 @@ import net.minecraftforge.network.simple.SimpleChannel;
 public class PacketHandler {
     private static final String PROTOCOL_VERSION = "1";
     public static final SimpleChannel CHANNEL = NetworkRegistry.newSimpleChannel(
-            Res.getResource("c11eraser", "main"),
+            Res.getResource(Eraser.MODID, "main"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals

@@ -7,11 +7,11 @@
   ],
   "key": {
     "N": {
-      "item": "eraser:null_ingot"
+      "item": "c11eraser:null_ingot"
     }
   },
   "result": {
-    "item": "eraser:snack_protect_boots",
+    "item": "c11eraser:snack_protect_boots",
     "count": 1
   }
 }

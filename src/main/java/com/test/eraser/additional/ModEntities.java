@@ -1,5 +1,6 @@
 package com.test.eraser.additional;
 
+import com.test.eraser.Eraser;
 import com.test.eraser.entity.HomingArrowEntity;
 import com.test.eraser.entity.Sand_Bag;
 import net.minecraft.world.entity.EntityType;
@@ -10,7 +11,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 public class ModEntities {
     public static final DeferredRegister<EntityType<?>> ENTITIES =
-            DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, "eraser");
+            DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, Eraser.MODID);
 
     public static final RegistryObject<EntityType<HomingArrowEntity>> HOMING_ARROW =
             ENTITIES.register("homing_arrow",
