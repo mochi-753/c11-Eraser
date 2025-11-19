@@ -36,6 +36,10 @@ public class Config {
             .comment("If enabled ClientMessage will be displayed when changing World Destroyer's mode.")
             .define("client_message", false);
 
+    public static final ForgeConfigSpec.BooleanValue SKIP_DEATH_ANIMATION = BUILDER
+            .comment("If true to skip the death animation of entities killed by the Eraser")
+            .define("skipAnimation", false);
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 
     private static Set<ResourceLocation> normalDieEntities = Set.of();

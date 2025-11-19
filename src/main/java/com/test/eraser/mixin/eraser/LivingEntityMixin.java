@@ -111,11 +111,11 @@ public abstract class LivingEntityMixin implements ILivingEntity {
         else if (Config.FORCE_DIE.get()) {
             markErased(self.getUUID());
             for (ServerPlayer sp : ((ServerLevel)self.level()).players()) {
-                PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), new EraseEntityPacket(self.getUUID(), SkipAnimation));
+                PacketHandler.CHANNEL.send(PacketDistributor.PLAYER.with(() -> sp), new EraseEntityPacket(self.getUUID(), SkipAnimation || Config.SKIP_DEATH_ANIMATION.get()));
             }
             this.setErased(true);
             forcedie(eraseSrc);
-            if(!SkipAnimation) {
+            if(!SkipAnimation && !Config.SKIP_DEATH_ANIMATION.get()) {
                 if (!(self instanceof ServerPlayer))
                     TaskScheduler.schedule(this::forceErase, 21);
             }
@@ -145,9 +145,9 @@ public abstract class LivingEntityMixin implements ILivingEntity {
                 if(self.getKillCredit() instanceof ServerPlayer player)player.awardStat(Stats.ENTITY_KILLED_BY.get(killer.getType()));
                 killer.awardKillScore(self, 0, source);
             }
-            //((LivingEntityAccessor) self).invokeDropAllDeathLoot(source);
-            ((LivingEntityAccessor)self).invokedropFromLootTable(source,false);
-            ((LivingEntityAccessor)self).invokedropExperience();
+            ((LivingEntityAccessor) self).invokeDropAllDeathLoot(source);
+            //((LivingEntityAccessor)self).invokedropFromLootTable(source,false);
+            //((LivingEntityAccessor)self).invokedropExperience();
         }
     }
 

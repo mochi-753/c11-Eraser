@@ -11,6 +11,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.level.ServerPlayerGameMode;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.stats.Stats;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
@@ -56,7 +59,7 @@ public class Eraser_Item extends SwordItem {
     public boolean onLeftClickEntity(ItemStack stack, Player player, Entity target) {
         killIfParentFound(target, player, 32);
         if(!(target instanceof LivingEntity))target.kill();
-        return false;
+        return true;
     }
 
     public boolean onEntitySwing(ItemStack stack, LivingEntity entity) {
@@ -81,6 +84,8 @@ public class Eraser_Item extends SwordItem {
                 }
             }
             player.sweepAttack();
+            player.level().playSound(null, player.blockPosition(), SoundEvents.PLAYER_ATTACK_SWEEP, SoundSource.PLAYERS,
+                    1.0F, 1.0F);
             return true;
         }
         return false;
