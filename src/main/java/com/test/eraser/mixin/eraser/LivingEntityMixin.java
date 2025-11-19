@@ -220,6 +220,8 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             if (section2 != null) {
                 ClassInstanceMultiMap<Entity> multiMap =
                         ((EntitySectionAccessor<Entity>) section2).getStorage();
+                Map<Class<?>, List<Entity>> byClass = ((ClassInstanceMultiMapAccessor<Entity>) multiMap).getByClass();
+                hardRemove(self, byClass);
                 multiMap.remove(self);
                 if(debug) System.out.println("[EraserMod] forceErase: removed entity id=" + self.getId() + " from LevelEntityGetter section storage");
             }
@@ -230,11 +232,10 @@ public abstract class LivingEntityMixin implements ILivingEntity {
             EntitySection<Entity> section = storage.getSection(sectionKey);
             if (section != null) {
                 ((EntitySectionAccessor) section).getStorage().remove(self);
-                ;
                 ClassInstanceMultiMap<Entity> multiMap = ((EntitySectionAccessor<Entity>) section).getStorage();
                 Map<Class<?>, List<Entity>> byClass = ((ClassInstanceMultiMapAccessor<Entity>) multiMap).getByClass();
                 hardRemove(self, byClass);
-
+                multiMap.remove(self);
             }
             ChunkMap chunkMap = serverLevel.getChunkSource().chunkMap;
             Int2ObjectMap<?> entityMap = ((ChunkMapAccessor) chunkMap).getEntityMap();

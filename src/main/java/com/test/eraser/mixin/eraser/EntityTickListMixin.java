@@ -13,7 +13,7 @@ public abstract class EntityTickListMixin {
     @Inject(method = "add", at = @At("HEAD"), cancellable = true)
     private void onAdd(Entity entity, CallbackInfo ci) {
         if (entity instanceof ILivingEntity erase && erase.isErased()) {
-            //ci.cancel();
+            ci.cancel();
         }
     }
 

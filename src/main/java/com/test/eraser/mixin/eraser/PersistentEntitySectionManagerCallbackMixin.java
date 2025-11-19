@@ -16,7 +16,7 @@ public abstract class PersistentEntitySectionManagerCallbackMixin {
     private void onMoveGuard(CallbackInfo ci) {
         if (realEntity instanceof ILivingEntity erased && erased.isErased()) {
             //System.out.println("[Eraser] Prevented moving entity in PersistentEntitySectionManager");
-            //ci.cancel();
+            ci.cancel();
         }
     }
 }
